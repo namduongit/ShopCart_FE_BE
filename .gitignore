@@ -1,0 +1,55 @@
+# Ignore Gradle project-specific cache directory
+.gradle/
+
+# Ignore Gradle build output directory
+build/
+
+# Ignore IntelliJ IDEA project files
+.idea/
+*.iml
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore node_modules for React frontend
+frontend/node_modules/
+
+# Ignore build output for React
+frontend/dist/
+
+# Ignore environment files
+*.env
+
+# Ignore target directory for Java
+backend/target/
+
+# Ignore npm debug log
+npm-debug.log*
+
+# Ignore yarn error log
+yarn-error.log*
+
+# Ignore coverage reports
+coverage/
+
+# Ignore local env files
+.env.*.local
+
+# Ignore package-lock and yarn lock if not used
+# package-lock.json
+yarn.lock
+
+# Ignore backend logs
+backend/*.log
+
+# Ignore backend .classpath, .project, .settings (Eclipse)
+backend/.classpath
+backend/.project
+backend/.settings/
