@@ -1,13 +1,13 @@
-package com.shop_cart.software_testing;
+package com.ShopCart_FE_BE;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SoftwareTestingApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SoftwareTestingApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
