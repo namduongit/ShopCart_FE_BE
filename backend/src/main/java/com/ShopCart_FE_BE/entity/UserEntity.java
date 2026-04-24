@@ -2,15 +2,8 @@ package com.ShopCart_FE_BE.entity;
 
 import java.util.List;
 
-import org.hibernate.annotations.ColumnDefault;
-
-import com.ShopCart_FE_BE.entity.types.CommonStatus;
-import com.ShopCart_FE_BE.entity.types.Role;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,17 +23,7 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
     
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    @ColumnDefault("'ACTIVE'")
-    private CommonStatus status;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    @ColumnDefault("'NONE'")
-    private Role role;
-
-    @OneToMany
+    @OneToMany(mappedBy = "userEntity")
     private List<CartEntity> cartEntities;
 
     public Long getId() {
@@ -65,22 +48,6 @@ public class UserEntity {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public CommonStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CommonStatus status) {
-        this.status = status;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
     public List<CartEntity> getCartEntities() {

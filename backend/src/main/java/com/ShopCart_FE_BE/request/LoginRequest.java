@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class RegisterRequest {
+public class LoginRequest {
     @NotNull(message = "Yêu cầu gửi email")
     @NotBlank(message = "Email không được để trống")
     @Pattern(regexp = "^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "Email không hợp lệ")
@@ -16,11 +16,6 @@ public class RegisterRequest {
     @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 6, max = 100, message = "Mật khẩu phải từ 6 đến 100 ký tự")
     private String password;
-
-    @NotNull(message = "Yêu cầu gửi mật khẩu xác nhận")
-    @NotBlank(message = "Mật khẩu xác nhận không được để trống")
-    @Size(min = 6, max = 100, message = "Mật khẩu xác nhận phải từ 6 đến 100 ký tự")
-    private String passwordConfirm;
 
     public String getEmail() {
         return email;
@@ -36,13 +31,5 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPasswordConfirm() {
-        return passwordConfirm;
-    }
-
-    public void setPasswordConfirm(String passwordConfirm) {
-        this.passwordConfirm = passwordConfirm;
     }
 }

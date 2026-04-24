@@ -7,8 +7,12 @@ import java.util.Map;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.ShopCart_FE_BE.entity.types.ProductStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,13 +26,20 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String mainImageURL;
-    private List<String> imageURLs;
+    private String mainImageUrl;
+    private List<String> imageUrls;
 
+    @Column(unique = true, nullable = false)
     private String name;
+
+    @Column(unique = true, nullable = false)
     private String slug;
 
-    private Integer quantity;
+    @Column(nullable = false, columnDefinition = "integer check (stock_quantity >= 0)")
+    private Integer stockQuantity;
+
+    @Column(nullable = false, columnDefinition = "integer check (reserved_stock_quantity >= 0)")
+    private Integer reservedStockQuantity;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
@@ -36,7 +47,11 @@ public class ProductEntity {
 
     private BigDecimal price;
 
-    @OneToMany
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
+    @OneToMany(mappedBy = "productEntity")
     private List<CartEntity> cartEntities;
 
     public Long getId() {
@@ -47,20 +62,20 @@ public class ProductEntity {
         this.id = id;
     }
 
-    public String getMainImageURL() {
-        return mainImageURL;
+    public String getMainImageUrl() {
+        return mainImageUrl;
     }
 
-    public void setMainImageURL(String mainImageURL) {
-        this.mainImageURL = mainImageURL;
+    public void setMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
     }
 
-    public List<String> getImageURLs() {
-        return imageURLs;
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImageURLs(List<String> imageURLs) {
-        this.imageURLs = imageURLs;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public String getName() {
@@ -79,20 +94,28 @@ public class ProductEntity {
         this.slug = slug;
     }
 
+    public Integer getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public Integer getReservedStockQuantity() {
+        return reservedStockQuantity;
+    }
+
+    public void setReservedStockQuantity(Integer reservedStockQuantity) {
+        this.reservedStockQuantity = reservedStockQuantity;
+    }
+
     public Map<String, Object> getAttributes() {
         return attributes;
     }
 
     public void setAttributes(Map<String, Object> attributes) {
         this.attributes = attributes;
-    }
-
-    public Integer getQuantity() {
-        return this.quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
     }
 
     public BigDecimal getPrice() {
@@ -109,5 +132,13 @@ public class ProductEntity {
 
     public void setCartEntities(List<CartEntity> cartEntities) {
         this.cartEntities = cartEntities;
+    }
+
+    public ProductStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProductStatus status) {
+        this.status = status;
     }
 }
