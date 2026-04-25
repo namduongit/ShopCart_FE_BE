@@ -4,9 +4,16 @@ import Button from "../../components/ui/button/button";
 import Form from "../../components/ui/form/form";
 import Input from "../../components/ui/input/input";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { useNavigate } from "react-router";
 
 const LoginPage = () => {
     const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        navigate('/page/product');
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-gray-100">
@@ -30,8 +37,9 @@ const LoginPage = () => {
                         <h1 className="text-2xl font-bold text-gray-800">Đăng nhập</h1>
                         <p className="text-gray-500 text-sm mt-1">Đăng nhập để tiếp tục mua sắm</p>
                     </div>
-                    <Form className="space-y-5 text-sm">
+                    <Form className="space-y-5 text-sm" onSubmit={handleSubmit}>
                         <Input
+                            data-testid="email-input"
                             lable="Email"   
                             lableRequired={true}
                             type="email"
@@ -40,6 +48,7 @@ const LoginPage = () => {
                             required
                         />
                         <Input
+                            data-testid="password-input"
                             lable="Mật khẩu"
                             lableRequired={true}
                             type={isShowPassword ? "text" : "password"}
@@ -53,7 +62,7 @@ const LoginPage = () => {
                             }
                             required
                         />
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition-colors shadow-sm">
+                        <Button type="submit" data-testid="login-btn" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition-colors shadow-sm">
                             Đăng nhập
                         </Button>
                         <div className="flex justify-between text-xs text-gray-500 mt-2">

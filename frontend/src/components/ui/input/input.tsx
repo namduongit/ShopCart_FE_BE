@@ -9,39 +9,52 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     lableRequired?: boolean;
 }
 
-const Input: React.FC<InputProps> = (props: InputProps) => {
+const Input: React.FC<InputProps> = ({
+    iconStart,
+    iconStartOnClick,
+    iconEnd,
+    iconEndOnClick,
+    lable,
+    lableRequired,
+    className = "",
+    type = "text",
+    ...inputProps
+}: InputProps) => {
     return (
         <div>
-            {props.lable && (
+            {lable && (
                 <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                    {props.lable}
-                    {props.lableRequired && <span className="text-red-500">*</span>}
+                    {lable}
+                    {lableRequired && <span className="text-red-500">*</span>}
                 </label>
             )}
 
             <div className="flex ring focus-within:ring-2 ring-blue-600 rounded-md border border-gray-300 overflow-hidden">
-                {props.iconStart && (
+                {iconStart && (
                     <button
                         type="button"
                         className="text-gray-600 px-3 bg-gray-100"
-                        onClick={props.iconStartOnClick}>
-                        {props.iconStart}
+                        onClick={iconStartOnClick}>
+                        {iconStart}
                     </button>
                 )}
                 <div className="w-full">
                     <input
-                        type={`${props.type || 'text'}`}
+                        {...inputProps}
+                        type={type}
                         className={`
                         w-full py-2
-                        ${props.iconStart && 'ps-2'}
+                        ${iconStart && 'ps-2'}
+                        ${className}
                         `}
                     />
                 </div>
-                {props.iconEnd && (
+                {iconEnd && (
                     <button
                         type="button"
-                        className="px-3 text-gray-600">
-                        {props.iconEnd}
+                        className="px-3 text-gray-600"
+                        onClick={iconEndOnClick}>
+                        {iconEnd}
                     </button>
                 )}
             </div>

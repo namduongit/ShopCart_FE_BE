@@ -7,10 +7,19 @@ interface CartItem extends ProductItemData {
 
 const computerProducts: ProductItemData[] = [
     {
+        id: 0,
+        name: "PC Xé Gió",
+        brand: "GearVN",
+        price: 16000000,
+        stock: 10,
+        specs: ["Intel Core i7", "RTX 4060", "16GB DDR5 RAM", "1TB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
+    },
+    {
         id: 1,
         name: "PC Chiến Thần",
         brand: "GearVN",
         price: 15000000,
+        stock: 10,
         specs: ["Intel Core i7", "RTX 4060", "16GB DDR5 RAM", "1TB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
     },
     {
@@ -18,6 +27,7 @@ const computerProducts: ProductItemData[] = [
         name: "PC Titan",
         brand: "GearVN",
         price: 23000000,
+        stock: 10,
         specs: ["AMD Ryzen 7", "RTX 4070", "32GB DDR5 RAM", "2TB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
     },
     {
@@ -25,6 +35,7 @@ const computerProducts: ProductItemData[] = [
         name: "PC Arch",
         brand: "GearVN",
         price: 12370000,
+        stock: 10,
         specs: ["Intel Core i5", "RTX 4050", "16GB RAM", "512GB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
     },
     {
@@ -32,6 +43,7 @@ const computerProducts: ProductItemData[] = [
         name: "PC Hủy Diệt",
         brand: "GearVN",
         price: 21490000,
+        stock: 10,
         specs: ["AMD Ryzen 9", "RTX 4080", "32GB DDR5 RAM", "2TB Gen4 SSD", "Hệ điều hành Arch Linux với DWM"],
     },
 ];
@@ -39,19 +51,21 @@ const computerProducts: ProductItemData[] = [
 const ProductPage = () => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-    const handleAddToCart = (product: ProductItemData) => {
+    const handleAddToCart = (product: ProductItemData, quantity: number) => {
+        const itemQuantity = Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+
         setCartItems(currentItems => {
             const existingItem = currentItems.find(item => item.id === product.id);
 
             if (existingItem) {
                 return currentItems.map((item) =>
                     item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
+                        ? { ...item, quantity: item.quantity + itemQuantity }
                         : item
                 );
             }
 
-            return [...currentItems, { ...product, quantity: 1 }];
+            return [...currentItems, { ...product, quantity: itemQuantity }];
         });
     };
 
