@@ -1,5 +1,7 @@
 package com.ShopCart_FE_BE.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.ShopCart_FE_BE.entity.CartEntity;
@@ -23,6 +25,16 @@ public class CartService {
         this.cartRepository = cartRepository;
         this.productService = productService;
         this.userService = userService;
+    }
+
+    /**
+     * Get carts by user Id
+     * 
+     * @param userId
+     * @return List<CartEntity>
+     */
+    public List<CartEntity> getAllCartsByUserId(Long userId) {
+        return this.cartRepository.findByUserId(userId);
     }
 
     /**
