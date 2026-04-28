@@ -40,6 +40,10 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.cors(cors -> cors.disable());
 
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/w-version/api/**").permitAll()
+            .anyRequest().authenticated()
+        );
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(this.authTokenFilter, UsernamePasswordAuthenticationFilter.class);

@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ShopCart_FE_BE.config.Response;
-import com.ShopCart_FE_BE.config.UserDetailsImp;
 import com.ShopCart_FE_BE.dto.ProductDto;
 import com.ShopCart_FE_BE.entity.ProductEntity;
 import com.ShopCart_FE_BE.service.ProductService;
@@ -28,9 +27,7 @@ public class ProductController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Response<List<ProductDto>>> getAllProduct(@AuthenticationPrincipal UserDetailsImp userDetailsImp) {
-        System.out.println("Authenticated user: " + userDetailsImp.getUsername() + " with id: " + userDetailsImp.getId());
-
+    public ResponseEntity<Response<List<ProductDto>>> getAllProduct() {
         List<ProductEntity> productEntities = this.productService.getAllProducts();
 
         Response<List<ProductDto>> response = ResponseHelper.Success(
@@ -49,6 +46,26 @@ public class ProductController {
             .collect(Collectors.toList())
         );
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<Response<ProductDto>> getProductById(@PathVariable(name = "id", required = true) Long id) {
+        ProductEntity productEntity = this.productService.getProductById(id);
+
+        ProductDto productDto = new ProductDto(
+            productEntity.getId(),
+            productEntity.getMainImageUrl(),
+            productEntity.getImageUrls(),
+            productEntity.getName(),
+            productEntity.getSlug(),
+            productEntity.getStockQuantity(),
+            productEntity.getAttributes(),
+            productEntity.getPrice(),
+            productEntity.getStatus().toString()
+        );
+
+        Response<ProductDto> response = ResponseHelper.Success(productDto);
         return ResponseEntity.ok(response);
     }
 }

@@ -1,145 +1,171 @@
-import { useState } from "react";
-import ProductItem, { type ProductItemData } from "../../components/ui/productItem/productItem";
+import { useCallback, useEffect, useState } from "react";
+import type { Product } from "../../libs/types/Product";
+import type { Response } from "../../libs/response";
+import { Api } from "../../libs/api";
+import ProductCard from "../../components/ui/product-card/product-card";
 
-interface CartItem extends ProductItemData {
-    quantity: number;
-}
-
-const computerProducts: ProductItemData[] = [
-    {
-        id: 0,
-        name: "PC Xé Gió",
-        brand: "GearVN",
-        price: 16000000,
-        stock: 10,
-        specs: ["Intel Core i7", "RTX 4060", "16GB DDR5 RAM", "1TB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
-    },
-    {
-        id: 1,
-        name: "PC Chiến Thần",
-        brand: "GearVN",
-        price: 15000000,
-        stock: 10,
-        specs: ["Intel Core i7", "RTX 4060", "16GB DDR5 RAM", "1TB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
-    },
-    {
-        id: 2,
-        name: "PC Titan",
-        brand: "GearVN",
-        price: 23000000,
-        stock: 10,
-        specs: ["AMD Ryzen 7", "RTX 4070", "32GB DDR5 RAM", "2TB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
-    },
-    {
-        id: 3,
-        name: "PC Arch",
-        brand: "GearVN",
-        price: 12370000,
-        stock: 10,
-        specs: ["Intel Core i5", "RTX 4050", "16GB RAM", "512GB NVMe SSD", "Hệ điều hành Arch Linux với DWM"],
-    },
-    {
-        id: 4,
-        name: "PC Hủy Diệt",
-        brand: "GearVN",
-        price: 21490000,
-        stock: 10,
-        specs: ["AMD Ryzen 9", "RTX 4080", "32GB DDR5 RAM", "2TB Gen4 SSD", "Hệ điều hành Arch Linux với DWM"],
-    },
+const SORT_OPTIONS = [
+    { value: "price_desc", label: "Giá: Cao đến thấp" },
+    { value: "price_asc", label: "Giá: Thấp đến cao" },
+    { value: "name_asc", label: "Tên A-Z" },
+    { value: "name_desc", label: "Tên Z-A" },
 ];
 
+const SkeletonCard = () => (
+    <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
+        <div className="skeleton" style={{ paddingTop: "75%" }} />
+        <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="skeleton" style={{ height: "14px", width: "85%" }} />
+            <div className="skeleton" style={{ height: "12px", width: "60%" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "8px" }}>
+                <div className="skeleton" style={{ height: "18px", width: "40%" }} />
+                <div className="skeleton" style={{ height: "32px", width: "90px", borderRadius: "6px" }} />
+            </div>
+        </div>
+    </div>
+);
+
 const ProductPage = () => {
-    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [search, setSearch] = useState("");
+    const [sort, setSort] = useState("price_desc");
 
-    const handleAddToCart = (product: ProductItemData, quantity: number) => {
-        const itemQuantity = Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const api = Api();
+            const res = await api.get<Response<Product[]>>("/w-version/api/products/");
+            const list: Product[] = Array.isArray(res.data?.data) ? res.data.data : [];
+            setProducts(list);
+        } catch {
+            setError("Không thể tải danh sách sản phẩm.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-        setCartItems(currentItems => {
-            const existingItem = currentItems.find(item => item.id === product.id);
+    useEffect(() => { void fetchProducts(); }, [fetchProducts]);
 
-            if (existingItem) {
-                return currentItems.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + itemQuantity }
-                        : item
-                );
-            }
-
-            return [...currentItems, { ...product, quantity: itemQuantity }];
+    const displayed = products
+        .filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => {
+            if (sort === "price_asc") return a.price - b.price;
+            if (sort === "price_desc") return b.price - a.price;
+            if (sort === "name_asc") return a.name.localeCompare(b.name);
+            if (sort === "name_desc") return b.name.localeCompare(a.name);
+            return 0;
         });
-    };
-
-    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-slate-100 via-white to-sky-100 px-4 py-10">
-            <div className="mx-auto max-w-7xl">
-                <div className="mb-8 flex flex-col gap-4 rounded-3xl bg-linear-to-br from-blue-100 to-blue-200 px-8 py-10 text-white shadow-2xl md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <p className="text-sm font-bold uppercase tracking-[0.35em] text-blue-700">Shop máy tính</p>
-                        <h1 className="mt-3 text-4xl font-black text-blue-500">Trang sản phẩm</h1>
+        <div style={{ padding: "32px 0" }}>
+            <div className="container-main">
+                {/* Header */}
+                <div style={{ marginBottom: "24px" }}>
+                    <h1 style={{ margin: "0 0 4px", fontSize: "22px", fontWeight: 800, color: "#111827" }}>
+                        Tất cả sản phẩm
+                    </h1>
+                    <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
+                        {!loading ? `${displayed.length} sản phẩm` : "Đang tải..."}
+                    </p>
+                </div>
+
+                {/* Filters */}
+                <div style={{
+                    display: "flex", alignItems: "center", gap: "12px",
+                    padding: "14px 16px", background: "#fff",
+                    border: "1px solid var(--border)", borderRadius: "10px",
+                    marginBottom: "24px", flexWrap: "wrap"
+                }}>
+                    {/* Search */}
+                    <div style={{ position: "relative", flex: 1, minWidth: "200px" }}>
+                        <i className="fa-solid fa-magnifying-glass" style={{
+                            position: "absolute", left: "10px", top: "50%",
+                            transform: "translateY(-50%)", color: "#9ca3af", fontSize: "13px", pointerEvents: "none"
+                        }} />
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Tìm theo tên sản phẩm..."
+                            style={{
+                                width: "100%", padding: "8px 10px 8px 32px",
+                                border: "1.5px solid var(--border)", borderRadius: "7px",
+                                fontSize: "13px", fontFamily: "inherit", color: "#111827",
+                            }}
+                            onFocus={e => e.currentTarget.style.borderColor = "#2563eb"}
+                            onBlur={e => e.currentTarget.style.borderColor = "var(--border)"}
+                        />
+                    </div>
+
+                    {/* Sort */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <label style={{ fontSize: "13px", color: "#374151", fontWeight: 500, whiteSpace: "nowrap" }}>
+                            Sắp xếp:
+                        </label>
+                        <select
+                            value={sort}
+                            onChange={e => setSort(e.target.value)}
+                            style={{
+                                padding: "8px 12px", border: "1.5px solid var(--border)",
+                                borderRadius: "7px", fontSize: "13px",
+                                fontFamily: "inherit", color: "#111827", background: "#fff",
+                                cursor: "pointer",
+                            }}
+                        >
+                            {SORT_OPTIONS.map(o => (
+                                <option key={o.value} value={o.value}>{o.label}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
-                <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-                    <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                        {computerProducts.map(product => (
-                                <ProductItem
-                                    key={product.id}
-                                    product={product}
-                                    onAddToCart={handleAddToCart}
-                                />
-                            )
-                        )}
-                    </section>
+                {/* Error */}
+                {error && !loading && (
+                    <div style={{
+                        padding: "12px 16px", borderRadius: "8px",
+                        background: "#fef2f2", border: "1px solid #fecaca",
+                        marginBottom: "20px", fontSize: "14px", color: "#dc2626",
+                        display: "flex", alignItems: "center", gap: "8px"
+                    }}>
+                        <i className="fa-solid fa-circle-exclamation" /> {error}
+                    </div>
+                )}
 
-                    <aside className="h-fit rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900">Giỏ hàng</h2>
-                            <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
-                                Số lượng: {totalItems}
-                            </span>
-                        </div>
-
-                        {cartItems.length === 0 ? (
-                            <p className="mt-6 text-sm text-slate-500">
-                                Giỏ hàng đang trống. Thêm sản phẩm vào để thấy nó ở đây
-                            </p>
-                        ) : (
-                            <div className="mt-6 space-y-4">
-                                {cartItems.map((item) => (
-                                    <div key={item.id} className="rounded-2xl bg-slate-50 p-4">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div>
-                                                <p className="font-semibold text-slate-900">{item.name}</p>
-                                                <p className="text-sm text-slate-500">{item.brand}</p>
-                                            </div>
-                                            <p className="text-sm font-semibold text-sky-700">x{item.quantity}</p>
-                                        </div>
-                                        <p className="mt-3 text-sm text-slate-600">
-                                            {item.price.toLocaleString()}đ mỗi bộ
-                                        </p>
-                                    </div>
-                                ))}
-
-                                <div className="border-t border-slate-200 pt-4">
-                                    <div className="flex items-center justify-between text-sm text-slate-500">
-                                        <span>Tổng số lượng</span>
-                                        <span>{totalItems}</span>
-                                    </div>
-                                    <div className="mt-2 flex items-center justify-between text-lg font-bold text-slate-900">
-                                        <span>Thành tiền</span>
-                                        <span>{totalPrice.toLocaleString()}đ</span>
-                                    </div>
+                {/* Grid */}
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                    gap: "16px",
+                }}>
+                    {loading
+                        ? Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
+                        : displayed.length > 0
+                            ? displayed.map(p => <ProductCard key={p.id} product={p} />)
+                            : (
+                                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "80px 0" }}>
+                                    <i className="fa-solid fa-box-open" style={{ fontSize: "40px", color: "#d1d5db", display: "block", marginBottom: "12px" }} />
+                                    <p style={{ color: "#6b7280", fontSize: "15px", margin: 0 }}>
+                                        {search ? `Không tìm thấy sản phẩm với từ khoá "${search}"` : "Chưa có sản phẩm nào"}
+                                    </p>
+                                    {search && (
+                                        <button onClick={() => setSearch("")} style={{
+                                            marginTop: "12px", padding: "8px 18px", borderRadius: "7px",
+                                            border: "1px solid var(--border)", background: "#fff",
+                                            fontSize: "13px", cursor: "pointer", fontFamily: "inherit", color: "#374151"
+                                        }}>
+                                            Xóa bộ lọc
+                                        </button>
+                                    )}
                                 </div>
-                            </div>
-                        )}
-                    </aside>
+                            )
+                    }
                 </div>
             </div>
         </div>
     );
-}
+};
 
 export default ProductPage;
