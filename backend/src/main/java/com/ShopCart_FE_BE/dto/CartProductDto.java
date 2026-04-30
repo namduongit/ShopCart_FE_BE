@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartDto {
+public class CartProductDto {
     private Long id;
-    private Integer quantity;
-    private BigDecimal total;
-    private CartProductDto product;
+    private String mainImageUrl;
+    private String name;
+    private BigDecimal price;
+    private String status;
 }

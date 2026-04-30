@@ -13,3 +13,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+env:
+  jwt_secret: this-is-long-secret-key-for-jwt-token-generation

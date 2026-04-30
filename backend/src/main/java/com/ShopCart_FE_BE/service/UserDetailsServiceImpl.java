@@ -37,6 +37,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         UserDetailsImp userDetailsImp = new UserDetailsImp(
             userEntity.getId(),
+            userEntity.getFullName(),
             userEntity.getEmail(),
             userEntity.getPassword()
         );

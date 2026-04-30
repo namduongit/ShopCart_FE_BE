@@ -25,15 +25,8 @@ const LoginPage = () => {
         const errs = validate();
         if (Object.keys(errs).length > 0) { setErrors(errs); return; }
         setLoading(true);
-        try {
-            const api = Api();
-            await api.post("/w-version/api/auth/login", form);
-            navigate("/");
-        } catch {
-            setServerError("Email hoặc mật khẩu không đúng.");
-        } finally {
-            setLoading(false);
-        }
+        const api = Api();
+        await api.post("/w-version/api/auth/login", form);
     };
 
     const onChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {

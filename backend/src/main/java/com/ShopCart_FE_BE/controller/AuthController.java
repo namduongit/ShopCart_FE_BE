@@ -46,7 +46,7 @@ public class AuthController {
         UserEntity user = this.userService.register(request);
         
         Response<UserDto> response = ResponseHelper.Success(
-            new UserDto(user.getId(), user.getEmail())
+            new UserDto(user.getId(), user.getFullName(), user.getEmail())
         );
         return ResponseEntity.ok(response);
     }

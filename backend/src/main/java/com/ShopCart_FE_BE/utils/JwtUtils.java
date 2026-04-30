@@ -34,13 +34,18 @@ public class JwtUtils {
         String token = Jwts.builder()
                 .setSubject(
                         userPrincipal.getUsername())
+
                 .claim("id", userPrincipal.getId())
+                .claim("email", userPrincipal.getUsername())
+                .claim("name", userPrincipal.getName())
+
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + 86400000))
+                
                 .signWith(this.getSigningKey())
                 .compact();
 
-        return new JwtDto(userPrincipal.getId(), userPrincipal.getUsername(), token);
+        return new JwtDto(userPrincipal.getId(), userPrincipal.getName(), userPrincipal.getUsername(), token);
     }
 
     public ResponseCookie setStateCookie(String token) {

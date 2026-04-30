@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartDto {
+public class OrderCouponDto {
     private Long id;
-    private Integer quantity;
-    private BigDecimal total;
-    private CartProductDto product;
+    private String name;
+    private BigDecimal value;
 }

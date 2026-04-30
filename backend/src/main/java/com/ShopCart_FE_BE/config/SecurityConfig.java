@@ -41,7 +41,7 @@ public class SecurityConfig {
         http.cors(cors -> cors.disable());
 
         http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/w-version/api/**").permitAll()
+            .requestMatchers("/w-version/auth/**").permitAll()
             .anyRequest().authenticated()
         );
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

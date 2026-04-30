@@ -1,25 +1,27 @@
 package com.ShopCart_FE_BE.controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ShopCart_FE_BE.config.Response;
-import com.ShopCart_FE_BE.dto.CartDetailDto;
+import com.ShopCart_FE_BE.config.UserDetailsImp;
 import com.ShopCart_FE_BE.dto.CartDto;
+import com.ShopCart_FE_BE.dto.CartProductDto;
 import com.ShopCart_FE_BE.entity.CartEntity;
-import com.ShopCart_FE_BE.request.AddCartRequest;
+import com.ShopCart_FE_BE.request.AddToCartRequest;
+import com.ShopCart_FE_BE.request.RemoveFromCartRequest;
 import com.ShopCart_FE_BE.service.CartService;
 import com.ShopCart_FE_BE.utils.ResponseHelper;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/w-version/api/carts/")
@@ -33,46 +35,32 @@ public class CartController {
     }
 
     /**
-     * Get cart detail from userId
-     * ? Require: userId -> In part variable
-     * 
-     * @param userId
-     * 
+     * Get cart detail from user
      */
-    @GetMapping("{userId}")
-    public ResponseEntity<Response<CartDetailDto>> getCartDetail(
-            @PathVariable(name = "userId", required = true) Long userId) {
-        List<CartEntity> cartEntities = this.cartService.getAllCartsByUserId(userId);
+    @GetMapping("")
+    public ResponseEntity<Response<List<CartDto>>> getCartDetail(
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp) {
+        List<CartEntity> cartEntities = this.cartService.getAllCartsByUserId(userDetailsImp.getId());
 
-        CartDetailDto cartDetailDto = new CartDetailDto();
-        Integer totalQuantity = 0;
-        BigDecimal totalPrice = new BigDecimal(0);
-        List<CartDto> cartDtos = new ArrayList<CartDto>();
-        for (CartEntity cartEntity : cartEntities) {
-            totalQuantity += cartEntity.getQuantity();
-            totalPrice = totalPrice.add(
-                    cartEntity.getProductEntity().getPrice().multiply(
-                            BigDecimal.valueOf(cartEntity.getQuantity())));
-            cartDtos.add(new CartDto(
-                    cartEntity.getProductEntity().getId(),
-                    cartEntity.getProductEntity().getName(),
-                    cartEntity.getQuantity(),
-                    cartEntity.getProductEntity().getPrice()
-                                .multiply(BigDecimal.valueOf(cartEntity.getQuantity()))));
-        }
+        Response<List<CartDto>> response = ResponseHelper.Success(cartEntities.stream().map(cartDto -> {
+            return new CartDto(
+                    cartDto.getId(),
+                    cartDto.getQuantity(),
+                    cartDto.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartDto.getQuantity())),
 
-        cartDetailDto.setCarts(cartDtos);
-        cartDetailDto.setTotalQuantity(totalQuantity);
-        cartDetailDto.setTotalPrice(totalPrice);
-
-        Response<CartDetailDto> response = ResponseHelper.Success(cartDetailDto);
+                    new CartProductDto(
+                            cartDto.getProductEntity().getId(),
+                            cartDto.getProductEntity().getMainImageUrl(),
+                            cartDto.getProductEntity().getName(),
+                            cartDto.getProductEntity().getPrice(),
+                            cartDto.getProductEntity().getStatus().toString()));
+        }).toList());
 
         return ResponseEntity.ok(response);
     }
 
     /**
      * Add new product into cart
-     * ? Require: userId -> In path variable
      * ? Body: JSON -> { productId: int, quantity: int }
      * 
      * * Require: Check stock of product before add to cart, Calculate total price
@@ -80,19 +68,56 @@ public class CartController {
      * ! Note: Throw exception in error case (quantity, missing field)
      * 
      */
-    @PostMapping("{userId}")
+    @PostMapping("add")
     public ResponseEntity<Response<CartDto>> addToCart(
-            @PathVariable(name = "userId", required = true) Long userId,
-            @Validated @RequestBody AddCartRequest request) {
-        CartEntity cartEntity = this.cartService.addToCart(userId, request);
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
+            @Valid @RequestBody AddToCartRequest request) {
 
-        Response<CartDto> response = ResponseHelper.Success(
-                new CartDto(cartEntity.getProductEntity().getId(),
+        CartEntity cartEntity = this.cartService.addToCart(userDetailsImp.getId(), request);
+        Response<CartDto> response = ResponseHelper.Success(new CartDto(
+                cartEntity.getId(),
+                cartEntity.getQuantity(),
+                cartEntity.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartEntity.getQuantity())),
+                new CartProductDto(
+                        cartEntity.getProductEntity().getId(),
+                        cartEntity.getProductEntity().getMainImageUrl(),
                         cartEntity.getProductEntity().getName(),
-                        cartEntity.getQuantity(),
-                        cartEntity.getProductEntity().getPrice()
-                                .multiply(BigDecimal.valueOf(cartEntity.getQuantity()))));
+                        cartEntity.getProductEntity().getPrice(),
+                        cartEntity.getProductEntity().getStatus().toString())));
 
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * Remove quantity product from user's cart
+     * ? Body: JSON -> { productId: int, quantity: int }
+     * 
+     * * Require: Check stock of product before remove from cart, Calculate total
+     * price of cart
+     * ! Note: Throw exception in error case (quantity, missing field)
+     * 
+     */
+    @PostMapping("remove")
+    public ResponseEntity<Response<CartDto>> removeFromCart(
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
+            @Valid @RequestBody RemoveFromCartRequest request) {
+
+        CartEntity cartEntity = this.cartService.removeFromCart(userDetailsImp.getId(), request);
+        if (cartEntity == null) {
+            return ResponseEntity.ok(ResponseHelper.Success(null));
+        }
+        Response<CartDto> response = ResponseHelper.Success(new CartDto(
+                cartEntity.getId(),
+                cartEntity.getQuantity(),
+                cartEntity.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartEntity.getQuantity())),
+                new CartProductDto(
+                        cartEntity.getProductEntity().getId(),
+                        cartEntity.getProductEntity().getMainImageUrl(),
+                        cartEntity.getProductEntity().getName(),
+                        cartEntity.getProductEntity().getPrice(),
+                        cartEntity.getProductEntity().getStatus().toString())));
+
+        return ResponseEntity.ok(response);
+    }
+
 }

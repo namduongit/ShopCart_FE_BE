@@ -1,7 +1,5 @@
 package com.ShopCart_FE_BE.dto;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartDto {
+public class ProductInventoryDto {
     private Long id;
-    private Integer quantity;
-    private BigDecimal total;
-    private CartProductDto product;
+    private Integer stockQuantity;
+    private Integer availableQuantity;
 }
