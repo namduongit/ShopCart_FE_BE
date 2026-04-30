@@ -1,5 +1,6 @@
 type Response<T> = {
     status: number;
+    success: boolean;
     message: string;
     errors: ErrorType;
     data: T;

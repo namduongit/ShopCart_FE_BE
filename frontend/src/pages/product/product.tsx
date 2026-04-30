@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Product } from "../../libs/types/Product";
 import type { Response } from "../../libs/response";
-import { Api } from "../../libs/api";
 import ProductCard from "../../components/ui/product-card/product-card";
 
 const SORT_OPTIONS = [

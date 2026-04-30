@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Product } from "../../libs/types/Product";
 import type { Response } from "../../libs/response";
-import { Api } from "../../libs/api";
 import ProductCard from "../../components/ui/product-card/product-card";
+import type { ProductDto } from "../../libs/dto/ProductDto";
+import { api } from "../../libs/api";
 
 const fmtPrice = (p: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(p);
@@ -22,7 +22,7 @@ const SkeletonCard = () => (
 );
 
 const HomePage = () => {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<ProductDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -30,10 +30,9 @@ const HomePage = () => {
         setLoading(true);
         setError("");
         try {
-            const api = Api();
-            const res = await api.get<Response<Product[]>>("/w-version/api/products/");
+            const res = await api.get<Response<ProductDto[]>>("/w-version/api/products/");
             // Lấy top 8 sản phẩm, sắp xếp theo giá giảm dần (nổi bật)
-            const list: Product[] = Array.isArray(res.data?.data)
+            const list: ProductDto[] = Array.isArray(res.data?.data)
                 ? res.data.data
                 : [];
             const featured = [...list]

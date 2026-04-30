@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Api } from "../../libs/api";
 
 const RegisterPage = () => {
     const [form, setForm] = useState({ fullName: "", email: "", password: "", confirmPassword: "" });

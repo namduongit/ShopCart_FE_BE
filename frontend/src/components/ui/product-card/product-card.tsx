@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router";
-import type { Product } from "../../../libs/types/Product";
+import type { Product } from "../../../libs/entity/ProductEntity";
 import { CartContext } from "../../../contexts/cart-context";
 
 interface ProductCardProps {

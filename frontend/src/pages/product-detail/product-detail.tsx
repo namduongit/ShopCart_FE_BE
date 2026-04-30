@@ -1,8 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
-import type { Product } from "../../libs/types/Product";
 import type { Response } from "../../libs/response";
-import { Api } from "../../libs/api";
 import { CartContext } from "../../contexts/cart-context";
 import ProductCard from "../../components/ui/product-card/product-card";
 

@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios, { AxiosError, type AxiosResponse } from "axios";
 
-export const Api = () => {
+const Api = () => {
     const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || "http://localhost:8080";
 
     const api = axios.create({
@@ -10,18 +10,19 @@ export const Api = () => {
     });
 
     api.interceptors.request.use((config => {
-        // You can add any custom headers or authentication tokens here if needed
         return config;
     }), error => {
         return Promise.reject(error);
     });
 
-    api.interceptors.response.use((response) => {
+    api.interceptors.response.use((response: AxiosResponse<any, any, {}>) => {
         return response;
-    }, error => {
-        // Handle errors globally if needed
+    }, (error: AxiosError) => {
         return Promise.reject(error);
     });
     
     return api;
 }
+
+export const api = Api();
+

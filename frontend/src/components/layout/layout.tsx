@@ -1,12 +1,18 @@
 import { useContext, useState } from "react";
 import { Outlet, Link, useLocation } from "react-router";
 import { CartContext } from "../../contexts/cart-context";
+import { AuthContext } from "../../contexts/auth-context";
 
 const WebLayout = () => {
     const cartContext = useContext(CartContext);
+    const authContext = useContext(AuthContext);
     const [search, setSearch] = useState("");
     const location = useLocation();
+
     const cartCount = cartContext?.cartItems.length ?? 0;
+    const name = authContext?.state?.name.split(" ").at(-1);
+
+    const [showAction, setShowAction] = useState<boolean>(false);
 
     const navLinks = [
         { to: "/", label: "Trang chủ" },
@@ -15,7 +21,6 @@ const WebLayout = () => {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-            {/* ── Top notice bar ── */}
             <div style={{ background: "#1e40af", padding: "6px 0", textAlign: "center" }}>
                 <span style={{ color: "#bfdbfe", fontSize: "13px" }}>
                     <i className="fa-solid fa-fire"></i>
@@ -23,7 +28,6 @@ const WebLayout = () => {
                 </span>
             </div>
 
-            {/* ── Main header ── */}
             <header style={{
                 background: "#ffffff",
                 borderBottom: "1px solid var(--border)",
@@ -133,29 +137,87 @@ const WebLayout = () => {
                         </button>
 
                         {/* Login */}
-                        <Link to="/page/login" style={{
-                            display: "flex", alignItems: "center", gap: "6px",
-                            padding: "8px 16px", borderRadius: "8px",
-                            background: "#2563eb", color: "white",
-                            fontSize: "13px", fontWeight: 600,
-                            transition: "background 0.15s",
-                        }}
-                            onMouseEnter={e => e.currentTarget.style.background = "#1d4ed8"}
-                            onMouseLeave={e => e.currentTarget.style.background = "#2563eb"}
-                        >
-                            <i className="fa-regular fa-circle-user" style={{ fontSize: "15px" }} />
-                            Đăng nhập
-                        </Link>
+                        {!authContext?.isAuthenticated ? (
+                            <Link to="/page/login" style={{
+                                display: "flex", alignItems: "center", gap: "6px",
+                                padding: "8px 16px", borderRadius: "8px",
+                                background: "#2563eb", color: "white",
+                                fontSize: "13px", fontWeight: 600,
+                                transition: "background 0.15s",
+                            }}
+                                onMouseEnter={e => e.currentTarget.style.background = "#1d4ed8"}
+                                onMouseLeave={e => e.currentTarget.style.background = "#2563eb"}
+                            >
+                                <i className="fa-regular fa-circle-user" style={{ fontSize: "15px" }} />
+                                Đăng nhập
+                            </Link>
+                        ) : (
+                            <div
+                                style={{ position: "relative" }}
+                                onClick={() => setShowAction(!showAction)}
+                            >
+                                <div style={{
+                                    display: "flex", alignItems: "center", gap: "8px",
+                                    padding: "8px 14px", borderRadius: "8px",
+                                    background: "#f1f5f9", cursor: "pointer",
+                                    fontSize: "13px", fontWeight: 600, color: "#1e293b",
+                                }}>
+                                    <i className="fa-regular fa-circle-user" style={{ fontSize: "17px", color: "#2563eb" }} />
+                                    Xin chào, <span style={{ color: "#2563eb" }}>{name ?? "Người dùng"}</span>
+                                    <i className="fa-solid fa-chevron-down" style={{ fontSize: "10px", color: "#64748b" }} />
+                                </div>
+
+                                {/* Dropdown */}
+                                {showAction && (
+                                    <div style={{
+                                        position: "absolute", top: "calc(100% + 6px)", right: 0,
+                                        background: "white", borderRadius: "10px",
+                                        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                                        border: "1px solid #e2e8f0",
+                                        minWidth: "180px", zIndex: 999,
+                                        overflow: "hidden",
+                                    }}>
+                                        <Link to="/page/history" style={{
+                                            display: "flex", alignItems: "center", gap: "10px",
+                                            padding: "11px 16px", fontSize: "13px",
+                                            color: "#334155", textDecoration: "none",
+                                        }}
+                                            onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"}
+                                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                        >
+                                            <i className="fa-regular fa-clock" style={{ fontSize: "14px", color: "#2563eb", width: "16px" }} />
+                                            Lịch sử
+                                        </Link>
+
+                                        <div style={{ height: "1px", background: "#f1f5f9", margin: "0 12px" }} />
+
+                                        <button
+                                            onClick={() => authContext?.clearState()}
+                                            style={{
+                                                display: "flex", alignItems: "center", gap: "10px",
+                                                padding: "11px 16px", fontSize: "13px",
+                                                color: "#ef4444", background: "none",
+                                                border: "none", width: "100%", cursor: "pointer",
+                                                textAlign: "left",
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.background = "#fff5f5"}
+                                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                        >
+                                            <i className="fa-solid fa-arrow-right-from-bracket" style={{ fontSize: "14px", width: "16px" }} />
+                                            Đăng xuất
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </header>
 
-            {/* ── Content ── */}
             <main style={{ flex: 1 }}>
                 <Outlet />
             </main>
 
-            {/* ── Footer ── */}
             <footer style={{
                 background: "#111827", color: "#9ca3af",
                 padding: "40px 0 20px", marginTop: "auto"
