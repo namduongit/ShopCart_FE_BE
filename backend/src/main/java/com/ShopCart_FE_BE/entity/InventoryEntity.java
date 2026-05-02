@@ -25,14 +25,8 @@ public class InventoryEntity {
     @Column(name = "stock_quantity", nullable = false, columnDefinition = "integer check (stock_quantity >= 0)")
     private Integer stockQuantity;
 
-    @Column(name = "reserved_quantity")
-    private Integer reservedQuantity = 0;
-
     @OneToOne()
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductEntity productEntity;
 
-    public Integer getAvailableQuantity() {
-        return this.stockQuantity - reservedQuantity;
-    }
 }
