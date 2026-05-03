@@ -31,6 +31,7 @@ import com.ShopCart_FE_BE.entity.ProductEntity;
 import com.ShopCart_FE_BE.entity.types.ProductStatus;
 import com.ShopCart_FE_BE.exception.InvalidException;
 import com.ShopCart_FE_BE.request.AddToCartRequest;
+
 import com.ShopCart_FE_BE.service.CartService;
 import com.ShopCart_FE_BE.service.UserDetailsServiceImpl;
 import com.ShopCart_FE_BE.utils.JwtUtils;
@@ -60,7 +61,6 @@ public class CartControllerIntegrationTest {
 
         private ProductEntity mockProduct;
         private CartEntity mockCart;
-        private InventoryEntity mockInventory;
         private String token;
 
         @BeforeEach
