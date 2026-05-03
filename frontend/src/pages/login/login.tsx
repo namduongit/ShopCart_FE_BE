@@ -65,6 +65,7 @@ const LoginPage = () => {
 
                 <SForm onSubmit={handleSubmit}>
                     <SInput
+                        data-testid="email-input"
                         name="email"
                         errors={errors}
                         value={form.email}
@@ -82,6 +83,7 @@ const LoginPage = () => {
                     />
 
                     <SInput
+                        data-testid="password-input"
                         name="password"
                         errors={errors}
                         value={form.password}
@@ -107,6 +109,7 @@ const LoginPage = () => {
 
                     <SButton
                         id="login-submit"
+                        data-testid="login-btn"
                         type="submit"
                         loading={{
                             isLoading: loading,
