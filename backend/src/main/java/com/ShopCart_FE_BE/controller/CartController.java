@@ -24,7 +24,7 @@ import com.ShopCart_FE_BE.utils.ResponseHelper;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/w-version/api/carts/")
+@RequestMapping("/api/carts/")
 public class CartController {
 
     private final CartService cartService;
@@ -119,5 +119,4 @@ public class CartController {
 
         return ResponseEntity.ok(response);
     }
-
 }
