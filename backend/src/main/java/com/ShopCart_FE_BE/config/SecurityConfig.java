@@ -42,7 +42,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers("/w-version/auth/**").permitAll()
-            .anyRequest().authenticated()
+            .anyRequest().permitAll()
         );
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

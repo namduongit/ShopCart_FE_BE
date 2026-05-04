@@ -45,7 +45,7 @@ public class ProductController {
                                 new ProductInventoryDto(
                                         productEntity.getInventoryEntity().getId(),
                                         productEntity.getInventoryEntity().getStockQuantity(),
-                                        productEntity.getInventoryEntity().getAvailableQuantity())))
+                                        productEntity.getStockAvailable())))
                         .toList());
 
         return ResponseEntity.ok(response);
@@ -69,7 +69,7 @@ public class ProductController {
                 new ProductInventoryDto(
                         productEntity.getInventoryEntity().getId(),
                         productEntity.getInventoryEntity().getStockQuantity(),
-                        productEntity.getInventoryEntity().getAvailableQuantity()));
+                        productEntity.getStockAvailable()));
 
         Response<ProductDto> response = ResponseHelper.Success(productDto);
         return ResponseEntity.ok(response);

@@ -8,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ShopCart_FE_BE.exception.UnauthenticationExeption;
 import com.ShopCart_FE_BE.service.UserDetailsServiceImpl;
 import com.ShopCart_FE_BE.utils.JwtUtils;
 
@@ -45,13 +44,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        
         // parse token
         Claims claims = this.jwtUtils.extractClaims(token);
         if (claims == null) {
             System.out.println("Invalid token - Token will be cleared");
             this.jwtUtils.clearStateCookie(response);
-        
-            throw new UnauthenticationExeption("Phiên làm việc không hợp lệ, vui lòng đăng nhập lại");
+            filterChain.doFilter(request, response);
+            return;
         }
 
         String email = claims.getSubject();

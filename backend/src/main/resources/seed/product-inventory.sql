@@ -543,43 +543,43 @@ INSERT INTO products (
 -- =============================================
 -- INSERT 20 KHO TƯƠNG ỨNG
 -- =============================================
-INSERT INTO inventories (stock_quantity, reserved_quantity, product_id)
-SELECT 50, 0, id FROM products WHERE slug = 'dell-xps-15-9530'
+INSERT INTO inventories (stock_quantity, product_id)
+SELECT 50, id FROM products WHERE slug = 'dell-xps-15-9530'
 UNION ALL
-SELECT 30, 0, id FROM products WHERE slug = 'apple-macbook-pro-14-m3-pro'
+SELECT 30, id FROM products WHERE slug = 'apple-macbook-pro-14-m3-pro'
 UNION ALL
-SELECT 45, 0, id FROM products WHERE slug = 'asus-rog-strix-g16-2024'
+SELECT 45, id FROM products WHERE slug = 'asus-rog-strix-g16-2024'
 UNION ALL
-SELECT 25, 0, id FROM products WHERE slug = 'lenovo-thinkpad-x1-carbon-gen11'
+SELECT 25, id FROM products WHERE slug = 'lenovo-thinkpad-x1-carbon-gen11'
 UNION ALL
-SELECT 40, 0, id FROM products WHERE slug = 'hp-spectre-x360-14-oled'
+SELECT 40, id FROM products WHERE slug = 'hp-spectre-x360-14-oled'
 UNION ALL
-SELECT 100, 0, id FROM products WHERE slug = 'acer-aspire-5-a515-58m'
+SELECT 100, id FROM products WHERE slug = 'acer-aspire-5-a515-58m'
 UNION ALL
-SELECT 10, 0, id FROM products WHERE slug = 'msi-titan-gt77-hx-13vi'
+SELECT 10, id FROM products WHERE slug = 'msi-titan-gt77-hx-13vi'
 UNION ALL
-SELECT 80, 0, id FROM products WHERE slug = 'lenovo-ideapad-slim5-16abr8'
+SELECT 80, id FROM products WHERE slug = 'lenovo-ideapad-slim5-16abr8'
 UNION ALL
-SELECT 60, 0, id FROM products WHERE slug = 'asus-zenbook-14-oled-ux3405ma'
+SELECT 60, id FROM products WHERE slug = 'asus-zenbook-14-oled-ux3405ma'
 UNION ALL
-SELECT 120, 0, id FROM products WHERE slug = 'dell-inspiron-15-3520'
+SELECT 120, id FROM products WHERE slug = 'dell-inspiron-15-3520'
 UNION ALL
-SELECT 20, 0, id FROM products WHERE slug = 'razer-blade-15-2024'
+SELECT 20, id FROM products WHERE slug = 'razer-blade-15-2024'
 UNION ALL
-SELECT 35, 0, id FROM products WHERE slug = 'hp-elitebook-840-g10'
+SELECT 35, id FROM products WHERE slug = 'hp-elitebook-840-g10'
 UNION ALL
-SELECT 55, 0, id FROM products WHERE slug = 'gigabyte-aorus-15-bkf-2023'
+SELECT 55, id FROM products WHERE slug = 'gigabyte-aorus-15-bkf-2023'
 UNION ALL
-SELECT 45, 0, id FROM products WHERE slug = 'microsoft-surface-laptop-5-13'
+SELECT 45, id FROM products WHERE slug = 'microsoft-surface-laptop-5-13'
 UNION ALL
-SELECT 70, 0, id FROM products WHERE slug = 'asus-tuf-gaming-a15-fa507nv'
+SELECT 70, id FROM products WHERE slug = 'asus-tuf-gaming-a15-fa507nv'
 UNION ALL
-SELECT 90, 0, id FROM products WHERE slug = 'apple-macbook-air-13-m2'
+SELECT 90, id FROM products WHERE slug = 'apple-macbook-air-13-m2'
 UNION ALL
-SELECT 50, 0, id FROM products WHERE slug = 'lenovo-legion-5-pro-gen8-amd'
+SELECT 50, id FROM products WHERE slug = 'lenovo-legion-5-pro-gen8-amd'
 UNION ALL
-SELECT 85, 0, id FROM products WHERE slug = 'hp-victus-15-fa1055tx'
+SELECT 85, id FROM products WHERE slug = 'hp-victus-15-fa1055tx'
 UNION ALL
-SELECT 75, 0, id FROM products WHERE slug = 'acer-nitro-16-an16-41'
+SELECT 75, id FROM products WHERE slug = 'acer-nitro-16-an16-41'
 UNION ALL
-SELECT 40, 0, id FROM products WHERE slug = 'samsung-galaxy-book4-pro-16';
+SELECT 40, id FROM products WHERE slug = 'samsung-galaxy-book4-pro-16';

@@ -72,4 +72,14 @@ public class ProductEntity {
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
     private List<OrderItemEntity> order_ItemEntities;
 
+    @SuppressWarnings("null")
+    public Integer getStockAvailable() {
+        InventoryEntity inventoryEntity = this.inventoryEntity;
+        List<CartEntity> cartEntities = this.cartEntities;
+
+        return inventoryEntity == null ? 0 : 
+        (cartEntities == null || cartEntities.size() == 0) ? 
+        inventoryEntity.getStockQuantity() : 
+        inventoryEntity.getStockQuantity() - cartEntities.stream().reduce(0, (sum, item) -> sum + item.getQuantity(), Integer::sum);
+    }
 }
