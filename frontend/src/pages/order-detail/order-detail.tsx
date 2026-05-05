@@ -24,7 +24,7 @@ const OrderDetailPage = () => {
         void query(() => OrderService.GetOrderById(Number(orderId)), {});
     }, [orderId]);
 
-    /* ── Loading ── */
+    /* Loading */
     if (loading) {
         return (
             <div className="container-main" style={{ padding: "32px 20px" }}>
@@ -52,7 +52,7 @@ const OrderDetailPage = () => {
         );
     }
 
-    /* ── Not found ── */
+    /* Not found */
     if (!order) {
         return (
             <div className="container-main" style={{ padding: "80px 20px", textAlign: "center" }}>
@@ -109,7 +109,7 @@ const OrderDetailPage = () => {
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 24, alignItems: "start" }}>
 
-                    {/* ── Left: Items ── */}
+                    {/* Left: Items */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
                         {/* Products */}
@@ -187,7 +187,7 @@ const OrderDetailPage = () => {
                         </div>
                     </div>
 
-                    {/* ── Right: Summary ── */}
+                    {/* Right: Summary */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
                         {/* Price summary */}

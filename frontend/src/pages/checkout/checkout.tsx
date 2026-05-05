@@ -21,7 +21,7 @@ const CheckoutPage = () => {
     const notificationContext = useContext(NotificateContext);
     const navigate = useNavigate();
 
-    const { query: queryOrder, loading: orderLoading } = useExecute<OrderDto>();
+    const { query: queryOrder, loading: orderLoading, errors: orderErrors } = useExecute<OrderDto>();
     const { query: queryCoupon, loading: couponLoading } = useExecute<CouponDto>();
 
     const [form, setForm] = useState({
@@ -37,7 +37,7 @@ const CheckoutPage = () => {
     const discount = coupon ? Math.min(coupon.value, subtotal) : 0;
     const total = subtotal - discount;
 
-    /* ── Auth guard ── */
+    /* Auth guard */
     if (!authContext?.isAuthenticated) {
         return (
             <div style={{ minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, padding: "40px 20px" }}>
@@ -50,7 +50,7 @@ const CheckoutPage = () => {
         );
     }
 
-    /* ── Empty cart guard ── */
+    /* Empty cart guard */
     if (cartItems.length === 0) {
         return (
             <div style={{ minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, padding: "40px 20px" }}>
@@ -94,10 +94,15 @@ const CheckoutPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.address.trim()) {
-            notificationContext?.showToast({ id: Date.now(), type: "warning", title: "Thiếu thông tin", message: "Vui lòng nhập địa chỉ giao hàng" });
+        if (form.couponCode.trim() && !coupon) {
+            notificationContext?.showToast({
+                id: Date.now(), type: "warning",
+                title: "Mã chưa được áp dụng",
+                message: "Bạn đã nhập mã giảm giá nhưng chưa áp dụng. Vui lòng nhấn \"Áp dụng\" hoặc xóa mã trước khi đặt hàng.",
+            });
             return;
         }
+        let createdOrderId: number | undefined;
         await queryOrder(
             () => OrderService.CreateOrder({
                 fullName: form.fullName,
@@ -108,16 +113,19 @@ const CheckoutPage = () => {
             {
                 issueNetwork: true,
                 onSuccess(data) {
-                    cartContext?.clearCart();
-                    notificationContext?.showToast({
-                        id: Date.now(), type: "success",
-                        title: "Đặt hàng thành công",
-                        message: `Đơn hàng #${data?.id} đã được tạo thành công!`,
-                    });
-                    navigate(`/page/orders/${data?.id}`);
+                    createdOrderId = data?.id;
                 },
             }
         );
+        if (createdOrderId !== undefined) {
+            await cartContext?.clearCart();
+            notificationContext?.showToast({
+                id: Date.now(), type: "success",
+                title: "Đặt hàng thành công",
+                message: `Đơn hàng #${createdOrderId} đã được tạo thành công!`,
+            });
+            navigate(`/page/orders/${createdOrderId}`);
+        }
     };
 
     return (
@@ -138,7 +146,7 @@ const CheckoutPage = () => {
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 24, alignItems: "start" }}>
 
-                    {/* ── Left: Shipping form ── */}
+                    {/* Left: Shipping form */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
                         {/* Shipping info */}
@@ -150,7 +158,7 @@ const CheckoutPage = () => {
                             <SForm onSubmit={handleSubmit} style={{ gap: "16px" }}>
                                 <SInput
                                     name="fullName"
-                                    errors={undefined}
+                                    errors={orderErrors}
                                     value={form.fullName}
                                     onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))}
                                     type="text"
@@ -162,7 +170,7 @@ const CheckoutPage = () => {
                                 />
                                 <SInput
                                     name="address"
-                                    errors={undefined}
+                                    errors={orderErrors}
                                     value={form.address}
                                     onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
                                     type="text"
@@ -256,7 +264,7 @@ const CheckoutPage = () => {
                         </div>
                     </div>
 
-                    {/* ── Right: Order summary ── */}
+                    {/* Right: Order summary */}
                     <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: 24, position: "sticky", top: 80 }}>
                         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#111827" }}>
                             Đơn hàng của bạn

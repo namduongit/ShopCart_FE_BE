@@ -15,8 +15,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
     const [added, setAdded] = useState(false);
     const [imgErr, setImgErr] = useState(false);
 
-    const isActive = product.status === "ACTIVE";
-    const stock = Number(product.inventory.availableQuantity);
+    const isActive = product.status === "ACTIVE" && product.inventory.availableQuantity > 0;
+    const stock = product.inventory.availableQuantity;
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();

@@ -36,7 +36,7 @@ const HomePage = () => {
 
     return (
         <div>
-            {/* ── Hero ── */}
+            {/* Hero */}
             <section style={{ background: "#1e3a8a", padding: "56px 0" }}>
                 <div className="container-main">
                     <p style={{ color: "#93c5fd", fontSize: "13px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
@@ -71,7 +71,7 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* ── Stats ── */}
+            {/* Stats */}
             <section style={{ background: "#1d4ed8", padding: "20px 0" }}>
                 <div className="container-main">
                     <div style={{ display: "flex", gap: "40px", flexWrap: "wrap" }}>
@@ -90,7 +90,7 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* ── Featured Products ── */}
+            {/* Featured Products */}
             <section id="san-pham" style={{ padding: "48px 0" }}>
                 <div className="container-main">
                     <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "24px" }}>
@@ -130,7 +130,7 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* ── Why choose us ── */}
+            {/* Why choose us */}
             <section style={{ background: "#ffffff", borderTop: "1px solid var(--border)", padding: "48px 0" }}>
                 <div className="container-main">
                     <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#111827", marginBottom: "28px" }}>

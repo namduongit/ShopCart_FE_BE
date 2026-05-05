@@ -20,6 +20,8 @@ const ProductDetailPage = () => {
     const { query: queryProduct, data: product, loading } = useExecute<ProductDto>();
     const { query: queryAll, data: allProducts } = useExecute<ProductDto[]>();
 
+    const [availableQuantity, setAvailableQuantity] = useState<number>(0);
+
     const [selectedImg, setSelectedImg] = useState("");
     const [qty, setQty] = useState(1);
     const [addingToCart, setAddingToCart] = useState(false);
@@ -33,6 +35,7 @@ const ProductDetailPage = () => {
         void queryProduct(() => ProductService.GetProductById(Number(id)), {
             onSuccess(data) {
                 setSelectedImg(data?.mainImageUrl ?? "");
+                setAvailableQuantity(data?.inventory?.availableQuantity ?? 0);
             }
         });
         void queryAll(() => ProductService.GetAllProducts(), {});
@@ -58,6 +61,7 @@ const ProductDetailPage = () => {
             setAddingToCart(true);
             await cartContext?.addToCart(product.id, qty);
             setAdded(true);
+            setAvailableQuantity(availableQuantity - qty);
             notificationContext?.showToast({
                 id: Date.now(), type: "success",
                 title: "Đã thêm vào giỏ",
@@ -75,7 +79,7 @@ const ProductDetailPage = () => {
         }
     };
 
-    /* ── Loading ── */
+    /* Loading */
     if (loading) {
         return (
             <div className="container-main" style={{ padding: "32px 20px" }}>
@@ -99,7 +103,7 @@ const ProductDetailPage = () => {
         );
     }
 
-    /* ── Error / Not found ── */
+    /* Error / Not found */
     if (!product) {
         return (
             <div className="container-main" style={{ padding: "80px 20px", textAlign: "center" }}>
@@ -119,14 +123,13 @@ const ProductDetailPage = () => {
         );
     }
 
-    const isActive = product.status === "ACTIVE";
+    const isActive = product.status === "ACTIVE" && availableQuantity > 0;
     const stock = product.inventory?.stockQuantity ?? 0;
     const allImages = [product.mainImageUrl, ...product.imageUrls].filter(Boolean);
     const isBusy = addingToCart;
 
     return (
         <div style={{ background: "#f9fafb", minHeight: "100vh" }}>
-            {/* ── Breadcrumb ── */}
             <div style={{ background: "#fff", borderBottom: "1px solid var(--border)" }}>
                 <div className="container-main" style={{ padding: "10px 20px" }}>
                     <nav style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#6b7280" }}>
@@ -141,7 +144,7 @@ const ProductDetailPage = () => {
                 </div>
             </div>
 
-            {/* ── Main ── */}
+            {/* Main */}
             <div className="container-main" style={{ padding: "32px 20px" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "start" }}>
 
@@ -224,9 +227,6 @@ const ProductDetailPage = () => {
                                     Chỉ còn {stock} sản phẩm
                                 </span>
                             )}
-                            <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: "auto" }}>
-                                SKU #{product.id}
-                            </span>
                         </div>
 
                         {/* Name */}
@@ -243,6 +243,20 @@ const ProductDetailPage = () => {
                                 Đã bao gồm VAT · Miễn phí vận chuyển
                             </p>
                         </div>
+
+                        {/* Inventory info */}
+                        {product.inventory && (
+                            <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, color: "#374151" }}>
+                                <span>
+                                    <span style={{ fontWeight: 600 }}>Kho: </span>
+                                    {product.inventory.stockQuantity} sản phẩm
+                                </span>
+                                <span>
+                                    <span style={{ fontWeight: 600 }}>Khả dụng: </span>
+                                    {availableQuantity} sản phẩm
+                                </span>
+                            </div>
+                        )}
 
                         {/* Specs preview */}
                         {product.attributes && Object.keys(product.attributes).length > 0 && (
@@ -276,10 +290,14 @@ const ProductDetailPage = () => {
                                 </span>
                                 <button
                                     onClick={() => setQty(q => Math.min(stock || 99, q + 1))}
-                                    disabled={!isActive}
+                                    disabled={!isActive || qty >= availableQuantity}
                                     style={{ width: 36, height: 36, border: "none", background: "#fff", cursor: isActive ? "pointer" : "not-allowed", color: isActive ? "#374151" : "#d1d5db", fontSize: 14, borderLeft: "1px solid var(--border)" }}
                                 >+</button>
                             </div>
+                        </div>
+
+                        <div>
+
                         </div>
 
                         <button
@@ -324,7 +342,7 @@ const ProductDetailPage = () => {
                     </div>
                 </div>
 
-                {/* ── Tabs ── */}
+                {/* Tabs */}
                 <div style={{ marginTop: 48 }}>
                     <div style={{ display: "flex", borderBottom: "2px solid var(--border)", marginBottom: 24 }}>
                         {(["specs", "description"] as const).map(t => {
@@ -387,7 +405,7 @@ const ProductDetailPage = () => {
                     </div>
                 </div>
 
-                {/* ── Related Products ── */}
+                {/* Related Products */}
                 {related.length > 0 && (
                     <div style={{ marginTop: 48 }}>
                         <h2 style={{ fontSize: 20, fontWeight: 800, color: "#111827", margin: "0 0 20px" }}>

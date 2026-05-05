@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import type { CartDto } from "../libs/dto/CartDto";
 import CartService from "../services/cartService";
 import { AuthContext } from "./auth-context";
+import { useExecute } from "../hooks/useExecute";
 
 interface CartContextType {
     cartItems: CartDto[];
@@ -10,8 +11,8 @@ interface CartContextType {
     addToCart: (productId: number, quantity: number) => Promise<void>;
     /** Giảm/xóa sản phẩm khỏi giỏ (gọi API remove, sau đó reload) */
     removeFromCart: (productId: number, quantity: number) => Promise<void>;
-    /** Xóa toàn bộ giỏ hàng trên client (dùng khi logout) */
-    clearCart: () => void;
+    /** Xóa toàn bộ giỏ hàng trên server và client */
+    clearCart: () => Promise<void>;
     /** Tải lại giỏ hàng từ server */
     fetchCart: () => Promise<void>;
 }
@@ -19,22 +20,23 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CartProvider = ({ children }: { children: React.ReactNode }) => {
+    const { GetCart, AddToCart, RemoveFromCart, ClearCart } = CartService;
+    const { query: queryListCart, loading } = useExecute<CartDto[]>();
+    const { query: queryAddCart } = useExecute<CartDto>();
+    const { query: queryRemoveCart } = useExecute<CartDto | null>();
+    const { query: queryClearCart } = useExecute<null>();
     const [cartItems, setCartItems] = useState<CartDto[]>([]);
-    const [loading, setLoading] = useState(false);
     const authContext = useContext(AuthContext);
 
     const fetchCart = useCallback(async () => {
         // Chỉ gọi API khi đã đăng nhập
         if (!authContext?.isAuthenticated) return;
-        try {
-            setLoading(true);
-            const result = await CartService.GetCart();
-            setCartItems(result.data ?? []);
-        } catch {
-            // lỗi bỏ qua — useExecute xử lý ở tầng component
-        } finally {
-            setLoading(false);
-        }
+        await queryListCart(() => GetCart(), {
+            issueNetwork: true,
+            onSuccess(data) {
+                setCartItems(data || []);
+            },
+        })
     }, [authContext?.isAuthenticated]);
 
     // Tải giỏ hàng khi trạng thái auth thay đổi
@@ -43,16 +45,21 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }, [fetchCart]);
 
     const addToCart = async (productId: number, quantity: number) => {
-        await CartService.AddToCart({ productId, quantity });
+        await queryAddCart(() => AddToCart({ productId, quantity }), {
+            issueNetwork: true,
+        });
         await fetchCart();
     };
 
     const removeFromCart = async (productId: number, quantity: number) => {
-        await CartService.RemoveFromCart({ productId, quantity });
+        await queryRemoveCart(() => RemoveFromCart({ productId, quantity }), {
+            issueNetwork: true,
+        });
         await fetchCart();
     };
 
-    const clearCart = () => {
+    const clearCart = async () => {
+        await queryClearCart(() => ClearCart(), { issueNetwork: true });
         setCartItems([]);
     };
 

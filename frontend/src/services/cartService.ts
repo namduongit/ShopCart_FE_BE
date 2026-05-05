@@ -20,6 +20,11 @@ const CartService = {
         const response = await api.post<Response<CartDto | null>>("/api/carts/remove", data);
         return response.data;
     },
+    /** Xóa toàn bộ giỏ hàng của user trên server */
+    async ClearCart() {
+        const response = await api.delete<Response<null>>("/api/carts/clear");
+        return response.data;
+    },
 }
 
 export default CartService;
