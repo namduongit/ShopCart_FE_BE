@@ -17,7 +17,12 @@ import com.ShopCart_FE_BE.entity.ProductEntity;
 import com.ShopCart_FE_BE.entity.UserEntity;
 import com.ShopCart_FE_BE.entity.types.OrderStatus;
 import com.ShopCart_FE_BE.exception.InvalidException;
+import com.ShopCart_FE_BE.exception.NotFoundResource;
+import com.ShopCart_FE_BE.repository.CouponRepository;
+import com.ShopCart_FE_BE.repository.InventoryRepository;
 import com.ShopCart_FE_BE.repository.OrderRepository;
+import com.ShopCart_FE_BE.repository.ProductRepository;
+import com.ShopCart_FE_BE.repository.UserRepository;
 import com.ShopCart_FE_BE.request.CreatePurchaseRequest;
 import com.ShopCart_FE_BE.request.CreatePurchaseRequest.PurchaseItem;
 
@@ -27,25 +32,23 @@ import jakarta.transaction.Transactional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-
-    // Service
-    private final UserService userService;
-    private final ProductService productService;
-    private final CouponService couponService;
-    private final InventoryService inventoryService;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final CouponRepository couponRepository;
+    private final InventoryRepository inventoryRepository;
 
     public OrderService(
             OrderRepository orderRepository,
-            UserService userService,
-            ProductService productService,
-            CouponService couponService,
-            InventoryService inventoryService
+            UserRepository userRepository,
+            ProductRepository productRepository,
+            CouponRepository couponRepository,
+            InventoryRepository inventoryRepository
         ) {
         this.orderRepository = orderRepository;
-        this.userService = userService;
-        this.productService = productService;
-        this.couponService = couponService;
-        this.inventoryService = inventoryService;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
+        this.couponRepository = couponRepository;
+        this.inventoryRepository = inventoryRepository;
     }
 
     /**
@@ -63,7 +66,7 @@ public class OrderService {
                 .map(PurchaseItem::getProductId)
                 .toList();
 
-        List<ProductEntity> productEntities = this.productService.getAllProductsById(ids);
+        List<ProductEntity> productEntities = this.productRepository.findAllById(ids);
 
         // Map<productId, ProductEntity>
         Map<Long, ProductEntity> mapProductIdEntity = new HashMap<>();
@@ -81,7 +84,8 @@ public class OrderService {
 
         CouponEntity couponEntity = null;
         if (request.getCouponCode() != null && !request.getCouponCode().isBlank()) {
-            couponEntity = this.couponService.getCouponByName(request.getCouponCode());
+            couponEntity = this.couponRepository.findByName(request.getCouponCode())
+                    .orElseThrow(() -> new NotFoundResource("Không tìm thấy mã giảm giá"));
             Date now = new Date(System.currentTimeMillis());
 
             if (couponEntity.getExpiryDate().before(now)) {
@@ -89,7 +93,8 @@ public class OrderService {
             }
         }
 
-        UserEntity userEntity = this.userService.getUserById(userId);
+        UserEntity userEntity = this.userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundResource("Không tìm thấy người dùng"));
 
         BigDecimal totalAmount = BigDecimal.ZERO;
         int totalQuantity = 0;
@@ -103,7 +108,7 @@ public class OrderService {
             // Update inventory
             InventoryEntity inventoryEntity = productEntity.getInventoryEntity();
             inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - item.getQuantity());
-            this.inventoryService.saveInventory(inventoryEntity);
+            this.inventoryRepository.save(inventoryEntity);
 
             // Push new OrderItemEntity to list
             OrderItemEntity orderItemEntity = new OrderItemEntity();
