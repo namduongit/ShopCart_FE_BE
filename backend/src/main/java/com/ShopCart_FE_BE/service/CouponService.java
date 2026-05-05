@@ -1,5 +1,6 @@
 package com.ShopCart_FE_BE.service;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class CouponService {
                 .orElseThrow(() -> new NotFoundResource("Không tìm thấy mã giảm giá"));
     }
 
-    public CouponEntity checkCouponValid(String code) {
+    public CouponEntity checkCouponValid(String code, BigDecimal totalAmount) {
         CouponEntity coupon = this.getCouponByName(code);
 
         Date now = new Date(System.currentTimeMillis());
@@ -39,6 +40,10 @@ public class CouponService {
 
         if (!coupon.getStatus().toString().equals("ACTIVE")) {
             throw new InvalidException("Mã giảm giá không còn hiệu lực");
+        }
+
+        if (coupon.getMinimumPurchaseAmount().compareTo(totalAmount) > 0) {
+            throw new InvalidException("Mã giảm giá không đủ điều kiện áp dụng");
         }
 
         return coupon;

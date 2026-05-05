@@ -73,7 +73,7 @@ const CheckoutPage = () => {
         if (!form.couponCode.trim()) return;
         setCouponError("");
         setCoupon(null);
-        await queryCoupon(() => CouponService.CheckCoupon(form.couponCode.trim()), {
+        await queryCoupon(() => CouponService.CheckCoupon(form.couponCode.trim(), subtotal), {
             onSuccess(data) {
                 if (data) {
                     setCoupon(data);

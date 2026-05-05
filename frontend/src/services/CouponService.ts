@@ -15,9 +15,9 @@ const CouponService = {
         return response.data;
     },
 
-    /** Kiểm tra coupon còn hiệu lực không — ném lỗi nếu hết hạn/inactive */
-    async CheckCoupon(code: string) {
-        const response = await api.get<Response<CouponDto>>(`/api/coupons/${code}/check`);
+    /** Kiểm tra coupon còn hiệu lực + đủ điều kiện áp dụng */
+    async CheckCoupon(code: string, totalAmount: number) {
+        const response = await api.post<Response<CouponDto>>("/api/coupons/check", { code, totalAmount });
         return response.data;
     },
 }

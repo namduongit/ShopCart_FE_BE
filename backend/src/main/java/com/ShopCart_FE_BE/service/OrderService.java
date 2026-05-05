@@ -112,8 +112,10 @@ public class OrderService {
         for (PurchaseItem item : request.getItems()) {
             ProductEntity productEntity = mapProductIdEntity.get(item.getProductId());
             InventoryEntity inventoryEntity = productEntity.getInventoryEntity();
-            inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - item.getQuantity());
-            this.inventoryRepository.save(inventoryEntity);
+
+            if (productEntity.getStatus().equals(ProductStatus.INACTIVE)) {
+                throw new InvalidException("Sản phẩm '" + productEntity.getName() + "' không khả dụng");
+            }
 
             if (inventoryEntity.getStockQuantity() < item.getQuantity()) {
                 throw new InvalidException(

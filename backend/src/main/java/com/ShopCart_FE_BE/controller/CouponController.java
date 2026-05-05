@@ -6,14 +6,19 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ShopCart_FE_BE.config.Response;
 import com.ShopCart_FE_BE.dto.CouponDto;
 import com.ShopCart_FE_BE.entity.CouponEntity;
+import com.ShopCart_FE_BE.request.CheckCouponRequest;
 import com.ShopCart_FE_BE.service.CouponService;
 import com.ShopCart_FE_BE.utils.ResponseHelper;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/coupons/")
@@ -59,10 +64,10 @@ public class CouponController {
         return ResponseEntity.ok(ResponseHelper.Success(toCouponDto(couponEntity)));
     }
 
-    @GetMapping("{code}/check")
+    @PostMapping("check")
     public ResponseEntity<Response<CouponDto>> checkCoupon(
-            @PathVariable String code) {
-        CouponEntity couponEntity = this.couponService.checkCouponValid(code);
+            @Valid @RequestBody CheckCouponRequest request) {
+        CouponEntity couponEntity = this.couponService.checkCouponValid(request.getCode(), request.getTotalAmount());
         return ResponseEntity.ok(ResponseHelper.Success(toCouponDto(couponEntity)));
     }
 }
