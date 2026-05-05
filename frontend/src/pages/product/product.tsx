@@ -1,6 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import type { Response } from "../../libs/response";
+import { useEffect } from "react";
 import ProductCard from "../../components/ui/product-card/product-card";
+import type { ProductDto } from "../../libs/dto/ProductDto";
+import { useExecute } from "../../hooks/useExecute";
+import ProductService from "../../services/ProductService";
+import { useState } from "react";
 
 const SORT_OPTIONS = [
     { value: "price_desc", label: "Giá: Cao đến thấp" },
@@ -24,30 +27,16 @@ const SkeletonCard = () => (
 );
 
 const ProductPage = () => {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const { query, data: products, loading } = useExecute<ProductDto[]>();
     const [search, setSearch] = useState("");
     const [sort, setSort] = useState("price_desc");
 
-    const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        setError("");
-        try {
-            const api = Api();
-            const res = await api.get<Response<Product[]>>("/w-version/api/products/");
-            const list: Product[] = Array.isArray(res.data?.data) ? res.data.data : [];
-            setProducts(list);
-        } catch {
-            setError("Không thể tải danh sách sản phẩm.");
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        void query(() => ProductService.GetAllProducts(), {});
     }, []);
 
-    useEffect(() => { void fetchProducts(); }, [fetchProducts]);
-
-    const displayed = products
+    const list = products ?? [];
+    const displayed = list
         .filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => {
             if (sort === "price_asc") return a.price - b.price;
@@ -92,6 +81,7 @@ const ProductPage = () => {
                                 width: "100%", padding: "8px 10px 8px 32px",
                                 border: "1.5px solid var(--border)", borderRadius: "7px",
                                 fontSize: "13px", fontFamily: "inherit", color: "#111827",
+                                boxSizing: "border-box",
                             }}
                             onFocus={e => e.currentTarget.style.borderColor = "#2563eb"}
                             onBlur={e => e.currentTarget.style.borderColor = "var(--border)"}
@@ -119,18 +109,6 @@ const ProductPage = () => {
                         </select>
                     </div>
                 </div>
-
-                {/* Error */}
-                {error && !loading && (
-                    <div style={{
-                        padding: "12px 16px", borderRadius: "8px",
-                        background: "#fef2f2", border: "1px solid #fecaca",
-                        marginBottom: "20px", fontSize: "14px", color: "#dc2626",
-                        display: "flex", alignItems: "center", gap: "8px"
-                    }}>
-                        <i className="fa-solid fa-circle-exclamation" /> {error}
-                    </div>
-                )}
 
                 {/* Grid */}
                 <div style={{

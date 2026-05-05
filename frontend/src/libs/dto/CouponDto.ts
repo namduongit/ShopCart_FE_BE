@@ -1,6 +1,8 @@
 export type CouponDto = {
     id: number;
-    name: number;
+    name: string;
+    value: number;
     status: string;
-    expirateDate: Date;
+    expiryDate: string;
+    isValid: boolean;
 }

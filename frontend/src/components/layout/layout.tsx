@@ -9,7 +9,7 @@ const WebLayout = () => {
     const [search, setSearch] = useState("");
     const location = useLocation();
 
-    const cartCount = cartContext?.cartItems.length ?? 0;
+    const cartCount = (cartContext?.cartItems ?? []).reduce((s, item) => s + item.quantity, 0);
     const name = authContext?.state?.name.split(" ").at(-1);
 
     const [showAction, setShowAction] = useState<boolean>(false);
@@ -112,12 +112,12 @@ const WebLayout = () => {
                     {/* Right actions */}
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
                         {/* Cart */}
-                        <button style={{
+                        <Link to="/page/cart" style={{
                             position: "relative", display: "flex", alignItems: "center", gap: "8px",
                             padding: "8px 14px", borderRadius: "8px",
                             border: "1.5px solid var(--border)", background: "#fff",
-                            cursor: "pointer", fontSize: "13px", color: "#374151", fontFamily: "inherit",
-                            transition: "border-color 0.15s",
+                            fontSize: "13px", color: "#374151", fontFamily: "inherit",
+                            transition: "border-color 0.15s", textDecoration: "none",
                         }}
                             onMouseEnter={e => e.currentTarget.style.borderColor = "#2563eb"}
                             onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
@@ -134,7 +134,7 @@ const WebLayout = () => {
                                     {cartCount}
                                 </span>
                             )}
-                        </button>
+                        </Link>
 
                         {/* Login */}
                         {!authContext?.isAuthenticated ? (
@@ -177,7 +177,7 @@ const WebLayout = () => {
                                         minWidth: "180px", zIndex: 999,
                                         overflow: "hidden",
                                     }}>
-                                        <Link to="/page/history" style={{
+                                        <Link to="/page/orders" style={{
                                             display: "flex", alignItems: "center", gap: "10px",
                                             padding: "11px 16px", fontSize: "13px",
                                             color: "#334155", textDecoration: "none",
@@ -186,7 +186,7 @@ const WebLayout = () => {
                                             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                                         >
                                             <i className="fa-regular fa-clock" style={{ fontSize: "14px", color: "#2563eb", width: "16px" }} />
-                                            Lịch sử
+                                            Đơn hàng của tôi
                                         </Link>
 
                                         <div style={{ height: "1px", background: "#f1f5f9", margin: "0 12px" }} />

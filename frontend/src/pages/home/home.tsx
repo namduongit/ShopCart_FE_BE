@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import type { Response } from "../../libs/response";
+import { useEffect } from "react";
 import ProductCard from "../../components/ui/product-card/product-card";
 import type { ProductDto } from "../../libs/dto/ProductDto";
-import { api } from "../../libs/api";
+import { useExecute } from "../../hooks/useExecute";
+import ProductService from "../../services/ProductService";
 
 const fmtPrice = (p: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(p);
@@ -21,32 +21,18 @@ const SkeletonCard = () => (
     </div>
 );
 
-const HomePage = () => {
-    const [products, setProducts] = useState<ProductDto[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+void fmtPrice; // suppress unused warning
 
-    const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        setError("");
-        try {
-            const res = await api.get<Response<ProductDto[]>>("/w-version/api/products/");
-            // Lấy top 8 sản phẩm, sắp xếp theo giá giảm dần (nổi bật)
-            const list: ProductDto[] = Array.isArray(res.data?.data)
-                ? res.data.data
-                : [];
-            const featured = [...list]
-                .sort((a, b) => b.price - a.price)
-                .slice(0, 8);
-            setProducts(featured);
-        } catch {
-            setError("Không thể tải sản phẩm. Kiểm tra kết nối API.");
-        } finally {
-            setLoading(false);
-        }
+const HomePage = () => {
+    const { query, data, loading } = useExecute<ProductDto[]>();
+
+    useEffect(() => {
+        void query(() => ProductService.GetAllProducts(), {});
     }, []);
 
-    useEffect(() => { void fetchProducts(); }, [fetchProducts]);
+    const featured = [...(data ?? [])]
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 8);
 
     return (
         <div>
@@ -124,20 +110,6 @@ const HomePage = () => {
                         </a>
                     </div>
 
-                    {/* Error */}
-                    {error && !loading && (
-                        <div style={{
-                            padding: "12px 16px", borderRadius: "8px",
-                            background: "#fef2f2", border: "1px solid #fecaca",
-                            marginBottom: "20px", fontSize: "14px", color: "#dc2626",
-                            display: "flex", alignItems: "center", gap: "8px"
-                        }}>
-                            <i className="fa-solid fa-circle-exclamation" />
-                            {error}
-                        </div>
-                    )}
-
-                    {/* Grid */}
                     <div style={{
                         display: "grid",
                         gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
@@ -145,8 +117,8 @@ const HomePage = () => {
                     }}>
                         {loading
                             ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-                            : products.length > 0
-                                ? products.map(p => <ProductCard key={p.id} product={p} />)
+                            : featured.length > 0
+                                ? featured.map(p => <ProductCard key={p.id} product={p} />)
                                 : (
                                     <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "60px 0" }}>
                                         <i className="fa-solid fa-box-open" style={{ fontSize: "40px", color: "#d1d5db", display: "block", marginBottom: "12px" }} />
@@ -172,10 +144,8 @@ const HomePage = () => {
                             { icon: "fa-headset", title: "Hỗ trợ kỹ thuật", desc: "Đội ngũ kỹ thuật viên hỗ trợ 8h–22h mỗi ngày", color: "#7c3aed" },
                         ].map(f => (
                             <div key={f.title} style={{
-                                padding: "20px",
-                                borderRadius: "10px",
-                                border: "1px solid var(--border)",
-                                background: "#f9fafb",
+                                padding: "20px", borderRadius: "10px",
+                                border: "1px solid var(--border)", background: "#f9fafb",
                             }}>
                                 <div style={{
                                     width: "40px", height: "40px", borderRadius: "8px",

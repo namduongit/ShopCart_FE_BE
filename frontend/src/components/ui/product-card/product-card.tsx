@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router";
-import type { Product } from "../../../libs/entity/ProductEntity";
 import { CartContext } from "../../../contexts/cart-context";
+import type { ProductDto } from "../../../libs/dto/ProductDto";
 
 interface ProductCardProps {
-    product: Product;
+    product: ProductDto;
 }
 
 const fmtPrice = (p: number) =>
@@ -16,12 +16,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
     const [imgErr, setImgErr] = useState(false);
 
     const isActive = product.status === "ACTIVE";
-    const stock = Number(product.stockQuantity);
+    const stock = Number(product.inventory.availableQuantity);
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        cartContext?.addToCart(product);
+        cartContext?.addToCart(product.id, 1);
         setAdded(true);
         setTimeout(() => setAdded(false), 1800);
     };

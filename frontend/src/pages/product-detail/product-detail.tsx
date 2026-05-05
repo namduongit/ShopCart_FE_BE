@@ -1,8 +1,12 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
-import type { Response } from "../../libs/response";
+import { useExecute } from "../../hooks/useExecute";
 import { CartContext } from "../../contexts/cart-context";
+import { NotificateContext } from "../../contexts/notificate-context";
+import { AuthContext } from "../../contexts/auth-context";
 import ProductCard from "../../components/ui/product-card/product-card";
+import ProductService from "../../services/ProductService";
+import type { ProductDto } from "../../libs/dto/ProductDto";
 
 const fmtPrice = (p: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(p);
@@ -10,56 +14,65 @@ const fmtPrice = (p: number) =>
 const ProductDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const cartContext = useContext(CartContext);
+    const notificationContext = useContext(NotificateContext);
+    const authContext = useContext(AuthContext);
 
-    const [product, setProduct] = useState<Product | null>(null);
-    const [related, setRelated] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const { query: queryProduct, data: product, loading } = useExecute<ProductDto>();
+    const { query: queryAll, data: allProducts } = useExecute<ProductDto[]>();
+
     const [selectedImg, setSelectedImg] = useState("");
     const [qty, setQty] = useState(1);
+    const [addingToCart, setAddingToCart] = useState(false);
     const [added, setAdded] = useState(false);
     const [tab, setTab] = useState<"specs" | "description">("specs");
     const [imgErr, setImgErr] = useState(false);
 
-    const fetchData = useCallback(async () => {
+    useEffect(() => {
         if (!id) return;
-        setLoading(true);
-        setError("");
         setImgErr(false);
-        try {
-            const api = Api();
-
-            // Fetch product detail
-            const res = await api.get<Response<Product>>(`/w-version/api/products/${id}`);
-            const p = res.data?.data ?? null;
-            setProduct(p);
-            setSelectedImg(p?.mainImageUrl ?? "");
-
-            // Fetch related products (all products then filter)
-            const allRes = await api.get<Response<Product[]>>("/w-version/api/products/");
-            const all: Product[] = Array.isArray(allRes.data?.data) ? allRes.data.data : [];
-            const rel = all
-                .filter(x => x.id !== Number(id) && x.status === "ACTIVE")
-                .sort(() => Math.random() - 0.5)
-                .slice(0, 4);
-            setRelated(rel);
-        } catch {
-            setError("Không tìm thấy sản phẩm.");
-        } finally {
-            setLoading(false);
-        }
+        void queryProduct(() => ProductService.GetProductById(Number(id)), {
+            onSuccess(data) {
+                setSelectedImg(data?.mainImageUrl ?? "");
+            }
+        });
+        void queryAll(() => ProductService.GetAllProducts(), {});
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }, [id]);
 
-    useEffect(() => {
-        void fetchData();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [fetchData]);
+    const related = (allProducts ?? [])
+        .filter(x => x.id !== Number(id) && x.status === "ACTIVE")
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 4);
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!product) return;
-        for (let i = 0; i < qty; i++) cartContext?.addToCart(product);
-        setAdded(true);
-        setTimeout(() => setAdded(false), 2000);
+        if (!authContext?.isAuthenticated) {
+            notificationContext?.showToast({
+                id: Date.now(), type: "warning",
+                title: "Chưa đăng nhập",
+                message: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
+            });
+            return;
+        }
+        try {
+            setAddingToCart(true);
+            await cartContext?.addToCart(product.id, qty);
+            setAdded(true);
+            notificationContext?.showToast({
+                id: Date.now(), type: "success",
+                title: "Đã thêm vào giỏ",
+                message: `${product.name} (x${qty}) đã được thêm vào giỏ hàng`,
+            });
+            setTimeout(() => setAdded(false), 2500);
+        } catch {
+            notificationContext?.showToast({
+                id: Date.now(), type: "warning",
+                title: "Lỗi",
+                message: "Không thể thêm vào giỏ hàng. Vui lòng thử lại.",
+            });
+        } finally {
+            setAddingToCart(false);
+        }
     };
 
     /* ── Loading ── */
@@ -86,13 +99,13 @@ const ProductDetailPage = () => {
         );
     }
 
-    /* ── Error ── */
-    if (error || !product) {
+    /* ── Error / Not found ── */
+    if (!product) {
         return (
             <div className="container-main" style={{ padding: "80px 20px", textAlign: "center" }}>
                 <i className="fa-solid fa-box-open" style={{ fontSize: 48, color: "#d1d5db", display: "block", marginBottom: 16 }} />
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: "#374151", margin: "0 0 8px" }}>
-                    {error || "Không tìm thấy sản phẩm"}
+                    Không tìm thấy sản phẩm
                 </h2>
                 <p style={{ color: "#9ca3af", marginBottom: 24 }}>ID sản phẩm không hợp lệ hoặc đã bị xóa.</p>
                 <Link to="/" style={{
@@ -107,8 +120,9 @@ const ProductDetailPage = () => {
     }
 
     const isActive = product.status === "ACTIVE";
-    const stock = Number(product.stockQuantity);
+    const stock = product.inventory?.stockQuantity ?? 0;
     const allImages = [product.mainImageUrl, ...product.imageUrls].filter(Boolean);
+    const isBusy = addingToCart;
 
     return (
         <div style={{ background: "#f9fafb", minHeight: "100vh" }}>
@@ -120,10 +134,7 @@ const ProductDetailPage = () => {
                         <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
                         <Link to="/page/product" style={{ color: "#2563eb" }}>Sản phẩm</Link>
                         <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
-                        <span style={{
-                            color: "#374151", maxWidth: 260,
-                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
-                        }}>
+                        <span style={{ color: "#374151", maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {product.name}
                         </span>
                     </nav>
@@ -136,7 +147,6 @@ const ProductDetailPage = () => {
 
                     {/* Left: Images */}
                     <div>
-                        {/* Main image */}
                         <div style={{
                             background: "#fff", border: "1px solid var(--border)",
                             borderRadius: "10px", overflow: "hidden",
@@ -144,13 +154,9 @@ const ProductDetailPage = () => {
                         }}>
                             {!imgErr && selectedImg ? (
                                 <img
-                                    src={selectedImg}
-                                    alt={product.name}
+                                    src={selectedImg} alt={product.name}
                                     onError={() => setImgErr(true)}
-                                    style={{
-                                        position: "absolute", inset: 0,
-                                        width: "100%", height: "100%", objectFit: "cover"
-                                    }}
+                                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
                                 />
                             ) : (
                                 <div style={{
@@ -229,10 +235,7 @@ const ProductDetailPage = () => {
                         </h1>
 
                         {/* Price */}
-                        <div style={{
-                            background: "#eff6ff", border: "1px solid #bfdbfe",
-                            borderRadius: 8, padding: "16px 20px"
-                        }}>
+                        <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: "16px 20px" }}>
                             <p style={{ margin: 0, fontSize: 30, fontWeight: 800, color: "#1d4ed8" }}>
                                 {fmtPrice(product.price)}
                             </p>
@@ -243,10 +246,7 @@ const ProductDetailPage = () => {
 
                         {/* Specs preview */}
                         {product.attributes && Object.keys(product.attributes).length > 0 && (
-                            <div style={{
-                                background: "#fff", border: "1px solid var(--border)",
-                                borderRadius: 8, overflow: "hidden"
-                            }}>
+                            <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
                                 {Object.entries(product.attributes).slice(0, 4).map(([k, v], i) => (
                                     <div key={k} style={{
                                         display: "flex", padding: "9px 16px",
@@ -260,7 +260,7 @@ const ProductDetailPage = () => {
                             </div>
                         )}
 
-                        {/* Qty + Actions */}
+                        {/* Qty + Add to cart */}
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                             <span style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Số lượng:</span>
                             <div style={{
@@ -269,50 +269,42 @@ const ProductDetailPage = () => {
                             }}>
                                 <button
                                     onClick={() => setQty(q => Math.max(1, q - 1))}
-                                    style={{
-                                        width: 36, height: 36, border: "none", background: "#fff",
-                                        cursor: "pointer", color: "#374151", fontSize: 14,
-                                        borderRight: "1px solid var(--border)"
-                                    }}
+                                    style={{ width: 36, height: 36, border: "none", background: "#fff", cursor: "pointer", color: "#374151", fontSize: 14, borderRight: "1px solid var(--border)" }}
                                 >−</button>
-                                <span style={{
-                                    width: 44, textAlign: "center", fontSize: 14,
-                                    fontWeight: 700, color: "#111827"
-                                }}>
+                                <span style={{ width: 44, textAlign: "center", fontSize: 14, fontWeight: 700, color: "#111827" }}>
                                     {qty}
                                 </span>
                                 <button
                                     onClick={() => setQty(q => Math.min(stock || 99, q + 1))}
                                     disabled={!isActive}
-                                    style={{
-                                        width: 36, height: 36, border: "none", background: "#fff",
-                                        cursor: isActive ? "pointer" : "not-allowed",
-                                        color: isActive ? "#374151" : "#d1d5db", fontSize: 14,
-                                        borderLeft: "1px solid var(--border)"
-                                    }}
+                                    style={{ width: 36, height: 36, border: "none", background: "#fff", cursor: isActive ? "pointer" : "not-allowed", color: isActive ? "#374151" : "#d1d5db", fontSize: 14, borderLeft: "1px solid var(--border)" }}
                                 >+</button>
                             </div>
                         </div>
 
                         <button
                             onClick={handleAddToCart}
-                            disabled={!isActive}
+                            disabled={!isActive || isBusy}
                             style={{
                                 padding: "13px 24px", borderRadius: 8, border: "none",
-                                background: added ? "#16a34a" : isActive ? "#2563eb" : "#e5e7eb",
-                                color: isActive ? "white" : "#9ca3af",
-                                fontSize: 15, fontWeight: 700, cursor: isActive ? "pointer" : "not-allowed",
+                                background: added ? "#16a34a" : (isActive && !isBusy) ? "#2563eb" : "#e5e7eb",
+                                color: (isActive && !isBusy) ? "white" : "#9ca3af",
+                                fontSize: 15, fontWeight: 700, cursor: (isActive && !isBusy) ? "pointer" : "not-allowed",
                                 fontFamily: "inherit", display: "flex", alignItems: "center",
                                 justifyContent: "center", gap: 8, transition: "background 0.2s"
                             }}
-                            onMouseEnter={e => { if (isActive && !added) e.currentTarget.style.background = "#1d4ed8"; }}
-                            onMouseLeave={e => { if (!added) e.currentTarget.style.background = isActive ? "#2563eb" : "#e5e7eb"; }}
+                            onMouseEnter={e => { if (isActive && !isBusy && !added) e.currentTarget.style.background = "#1d4ed8"; }}
+                            onMouseLeave={e => { if (!added) e.currentTarget.style.background = (isActive && !isBusy) ? "#2563eb" : "#e5e7eb"; }}
                         >
-                            <i className={added ? "fa-solid fa-check" : "fa-solid fa-cart-plus"} />
-                            {added ? "Đã thêm vào giỏ hàng!" : "Thêm vào giỏ hàng"}
+                            {isBusy
+                                ? <><i className="fa-solid fa-circle-notch fa-spin" /> Đang thêm...</>
+                                : added
+                                    ? <><i className="fa-solid fa-check" /> Đã thêm vào giỏ hàng!</>
+                                    : <><i className="fa-solid fa-cart-plus" /> Thêm vào giỏ hàng</>
+                            }
                         </button>
 
-                        {/* Trust */}
+                        {/* Trust badges */}
                         <div style={{
                             display: "flex", gap: 16, flexWrap: "wrap",
                             padding: "12px 16px", background: "#f9fafb",
@@ -382,8 +374,7 @@ const ProductDetailPage = () => {
                         {tab === "description" && (
                             <div>
                                 <p style={{ color: "#374151", fontSize: 14, lineHeight: 1.8, margin: 0 }}>
-                                    {product.name} là sản phẩm máy tính chính hãng với cấu hình mạnh mẽ, đáp ứng mọi nhu cầu
-                                    từ làm việc văn phòng đến đồ họa, gaming và lập trình.
+                                    {product.description || `${product.name} là sản phẩm chính hãng với cấu hình mạnh mẽ, đáp ứng mọi nhu cầu.`}
                                 </p>
                                 <ul style={{ marginTop: 14, paddingLeft: 20, color: "#6b7280", fontSize: 14, lineHeight: 2 }}>
                                     <li>Sản phẩm chính hãng, có tem bảo hành rõ ràng</li>
