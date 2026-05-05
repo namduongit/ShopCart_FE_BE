@@ -12,9 +12,8 @@ import com.ShopCart_FE_BE.service.InventoryService;
 import com.ShopCart_FE_BE.utils.ResponseHelper;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/api/inventories")
 public class InventoryController {
-    
 
     private final InventoryService inventoryService;
 
@@ -22,36 +21,23 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    // @GetMapping("/{productId}/check")
-    // public ResponseEntity<Response<Boolean>> checkStock(
-    //     @PathVariable Long productId, 
-    //     @RequestParam int quantity
-    // ) {
-    //     boolean available = this.inventoryService.isAvailable(productId, quantity);
-
-    //     Response<Boolean> res = ResponseHelper.Success(available);
-    //     return ResponseEntity.ok(res);
-    // }
-
     @PutMapping("/{productId}/decrease")
     public ResponseEntity<Response<Void>> decreaseStock(
-        @PathVariable Long productId,
-        @RequestParam int quantity
-    ) {
+            @PathVariable Long productId,
+            @RequestParam int quantity) {
         this.inventoryService.decreaseStock(productId, quantity);
 
         return ResponseEntity
-                    .ok(ResponseHelper.Success(null));
+                .ok(ResponseHelper.Success(null));
     }
 
     @PutMapping("/{productId}/increase")
     public ResponseEntity<Response<Void>> increaseStock(
-        @PathVariable Long productId,
-        @RequestParam int quantity
-    ) {
+            @PathVariable Long productId,
+            @RequestParam int quantity) {
         this.inventoryService.increaseStock(productId, quantity);
 
         return ResponseEntity
-            .ok(ResponseHelper.Success(null));
+                .ok(ResponseHelper.Success(null));
     }
 }

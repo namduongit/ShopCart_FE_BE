@@ -36,7 +36,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-
         String token = this.extractTokenFromCookie(request);
         System.out.println("Extracted token: " + token);
         // Token is not exist, continue to next filter
@@ -44,7 +43,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         // parse token
         Claims claims = this.jwtUtils.extractClaims(token);
         if (claims == null) {

@@ -7,7 +7,10 @@ export type OrderDto = {
     fullName: string;
     address: string;
     status: string;
+    paymentMethod: string;
+    paymentStatus: string;
     totalAmount: number;
+    shippingFee: number;
     totalQuantity: number;
     user: UserDto;
     items: OrderItemDto[];

@@ -3,6 +3,8 @@ package com.ShopCart_FE_BE.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.ShopCart_FE_BE.entity.types.OrderPaymentStatus;
+import com.ShopCart_FE_BE.entity.types.OrderPaymentType;
 import com.ShopCart_FE_BE.entity.types.OrderStatus;
 
 import jakarta.persistence.CascadeType;
@@ -35,6 +37,9 @@ public class OrderEntity {
     private BigDecimal totalAmount;
 
     @Column(nullable = false)
+    private BigDecimal shippingFee;
+
+    @Column(nullable = false)
     private Integer totalQuantity;
 
     @Column(nullable = false)
@@ -44,8 +49,19 @@ public class OrderEntity {
     private String address;
 
     @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderPaymentType paymentMethod;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderPaymentStatus paymentStatus;
 
     /* Relationship */
     @ManyToOne()

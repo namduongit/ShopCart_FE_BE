@@ -76,10 +76,83 @@ const CartPage = () => {
                             padding: "10px 24px", borderRadius: 8, background: "#2563eb",
                             color: "white", fontWeight: 600, fontSize: 14
                         }}>
-                            <i className="fa-solid fa-store" /> Tiếp tục mua sắm
+                            {/* Illustration */}
+                            <div style={{ position: "relative", display: "inline-block", marginBottom: 28 }}>
+                                <div style={{
+                                    width: 100, height: 100, borderRadius: "50%",
+                                    background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    margin: "0 auto"
+                                }}>
+                                    <i className="fa-solid fa-basket-shopping" style={{ fontSize: 44, color: "#3b82f6" }} />
+                                </div>
+                                {/* Badge */}
+                                <div style={{
+                                    position: "absolute", top: 0, right: -4,
+                                    width: 28, height: 28, borderRadius: "50%",
+                                    background: "#f3f4f6", border: "2px solid #fff",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    fontSize: 13, fontWeight: 800, color: "#9ca3af"
+                                }}>0</div>
+                            </div>
+
+                            <h2 style={{ margin: "0 0 10px", fontSize: 22, fontWeight: 800, color: "#111827" }}>
+                                Giỏ hàng đang trống
+                            </h2>
+                            <p style={{ margin: "0 0 32px", fontSize: 14, color: "#6b7280", lineHeight: 1.6 }}>
+                                Bạn chưa thêm sản phẩm nào vào giỏ hàng.<br />
+                                Khám phá ngay hàng ngàn sản phẩm của chúng tôi!
+                            </p>
+
+                            {/* Benefits */}
+                            <div style={{ display: "flex", justifyContent: "center", gap: 24, marginBottom: 32 }}>
+                                {[
+                                    { icon: "fa-truck-fast", text: "Giao hàng\nnhanh" },
+                                    { icon: "fa-shield-halved", text: "Bảo hành\nchính hãng" },
+                                    { icon: "fa-rotate-left", text: "Đổi trả\ndễ dàng" },
+                                ].map(b => (
+                                    <div key={b.icon} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                                        <div style={{
+                                            width: 40, height: 40, borderRadius: 10,
+                                            background: "#f0f9ff", display: "flex", alignItems: "center", justifyContent: "center"
+                                        }}>
+                                            <i className={`fa-solid ${b.icon}`} style={{ fontSize: 16, color: "#0ea5e9" }} />
+                                        </div>
+                                        <span style={{ fontSize: 11, color: "#9ca3af", whiteSpace: "pre-line", lineHeight: 1.4, fontWeight: 500 }}>
+                                            {b.text}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* CTAs */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                <Link to="/page/product" style={{
+                                    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+                                    padding: "13px 24px", borderRadius: 10, background: "#2563eb",
+                                    color: "white", fontWeight: 700, fontSize: 14, textDecoration: "none",
+                                    transition: "background 0.15s"
+                                }}
+                                    onMouseEnter={e => e.currentTarget.style.background = "#1d4ed8"}
+                                    onMouseLeave={e => e.currentTarget.style.background = "#2563eb"}>
+                                    <i className="fa-solid fa-store" /> Khám phá sản phẩm
+                                </Link>
+                                <Link to="/" style={{
+                                    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+                                    padding: "11px 24px", borderRadius: 10,
+                                    border: "1.5px solid #e5e7eb", background: "#fff",
+                                    color: "#374151", fontWeight: 600, fontSize: 14, textDecoration: "none",
+                                    transition: "border-color 0.15s"
+                                }}
+                                    onMouseEnter={e => e.currentTarget.style.borderColor = "#2563eb"}
+                                    onMouseLeave={e => e.currentTarget.style.borderColor = "#e5e7eb"}>
+                                    <i className="fa-solid fa-house" /> Về trang chủ
+                                </Link>
+                            </div>
                         </Link>
                     </div>
                 )}
+
 
                 {cartItems.length > 0 && (
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 24, alignItems: "start" }}>

@@ -8,11 +8,21 @@ const fmtPrice = (p: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(p);
 
 const STATUS_MAP: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
-    PENDING:   { label: "Chờ xác nhận", color: "#d97706", bg: "#fffbeb", border: "#fde68a",  icon: "fa-clock" },
-    CONFIRMED: { label: "Đã xác nhận",  color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe",  icon: "fa-circle-check" },
-    SHIPPING:  { label: "Đang giao",    color: "#7c3aed", bg: "#f5f3ff", border: "#ddd6fe",  icon: "fa-truck" },
-    DELIVERED: { label: "Đã giao",      color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0",  icon: "fa-box-open" },
-    CANCELLED: { label: "Đã hủy",       color: "#dc2626", bg: "#fef2f2", border: "#fecaca",  icon: "fa-xmark-circle" },
+    PENDING: { label: "Chờ xác nhận", color: "#d97706", bg: "#fffbeb", border: "#fde68a",  icon: "fa-clock" },
+    CONFIRM: { label: "Đã xác nhận",  color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe",  icon: "fa-circle-check" },
+    SUCCESS: { label: "Hoàn thành",   color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0",  icon: "fa-check-double" },
+    FAILED:  { label: "Đã hủy",       color: "#dc2626", bg: "#fef2f2", border: "#fecaca",  icon: "fa-xmark-circle" },
+};
+
+const PAYMENT_STATUS_MAP: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
+    PENDING: { label: "Chờ thanh toán", color: "#d97706", bg: "#fffbeb", border: "#fde68a", icon: "fa-clock" },
+    SUCCESS: { label: "Đã thanh toán",  color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0", icon: "fa-circle-check" },
+    FAILED:  { label: "Thanh toán lỗi", color: "#dc2626", bg: "#fef2f2", border: "#fecaca", icon: "fa-xmark-circle" },
+};
+
+const PAYMENT_METHOD_MAP: Record<string, string> = {
+    COD:  "Thanh toán khi nhận hàng (COD)",
+    MOMO: "Ví MoMo",
 };
 
 const OrderDetailPage = () => {
@@ -77,8 +87,11 @@ const OrderDetailPage = () => {
     const statusInfo = STATUS_MAP[order.status] ?? {
         label: order.status, color: "#6b7280", bg: "#f9fafb", border: "#e5e7eb", icon: "fa-circle"
     };
+    const paymentStatusInfo = PAYMENT_STATUS_MAP[order.paymentStatus] ?? {
+        label: order.paymentStatus, color: "#6b7280", bg: "#f9fafb", border: "#e5e7eb", icon: "fa-circle"
+    };
     const subtotal = order.items.reduce((s, item) => s + item.total, 0);
-    const discount = order.coupon ? subtotal - order.totalAmount : 0;
+    const couponDiscount = order.coupon ? Math.min(order.coupon.value, subtotal) : 0;
 
     return (
         <div style={{ background: "#f9fafb", minHeight: "100vh", padding: "32px 0" }}>
@@ -104,6 +117,15 @@ const OrderDetailPage = () => {
                     }}>
                         <i className={`fa-solid ${statusInfo.icon}`} style={{ fontSize: 12 }} />
                         {statusInfo.label}
+                    </span>
+                    <span style={{
+                        padding: "5px 14px", borderRadius: 6, fontSize: 13, fontWeight: 600,
+                        color: paymentStatusInfo.color, background: paymentStatusInfo.bg,
+                        border: `1px solid ${paymentStatusInfo.border}`,
+                        display: "flex", alignItems: "center", gap: 6
+                    }}>
+                        <i className={`fa-solid ${paymentStatusInfo.icon}`} style={{ fontSize: 12 }} />
+                        {paymentStatusInfo.label}
                     </span>
                 </div>
 
@@ -183,6 +205,24 @@ const OrderDetailPage = () => {
                                         <span style={{ fontSize: 13, color: "#6b7280" }}>{order.user.email}</span>
                                     </div>
                                 )}
+                                <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+                                <div style={{ display: "flex", gap: 8 }}>
+                                    <span style={{ fontSize: 13, fontWeight: 600, color: "#374151", minWidth: 120 }}>Thanh toán</span>
+                                    <span style={{ fontSize: 13, color: "#6b7280" }}>
+                                        {PAYMENT_METHOD_MAP[order.paymentMethod] ?? order.paymentMethod}
+                                    </span>
+                                </div>
+                                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                                    <span style={{ fontSize: 13, fontWeight: 600, color: "#374151", minWidth: 120 }}>Trạng thái TT</span>
+                                    <span style={{
+                                        padding: "2px 8px", borderRadius: 4, fontSize: 12, fontWeight: 600,
+                                        color: paymentStatusInfo.color, background: paymentStatusInfo.bg,
+                                        border: `1px solid ${paymentStatusInfo.border}`
+                                    }}>
+                                        <i className={`fa-solid ${paymentStatusInfo.icon}`} style={{ marginRight: 4, fontSize: 11 }} />
+                                        {paymentStatusInfo.label}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -200,15 +240,17 @@ const OrderDetailPage = () => {
                                     <span>Tạm tính</span>
                                     <span style={{ fontWeight: 600, color: "#111827" }}>{fmtPrice(subtotal)}</span>
                                 </div>
-                                {order.coupon && discount > 0 && (
+                                {order.coupon && couponDiscount > 0 && (
                                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#16a34a" }}>
                                         <span>Giảm giá ({order.coupon.name})</span>
-                                        <span style={{ fontWeight: 600 }}>−{fmtPrice(discount)}</span>
+                                        <span style={{ fontWeight: 600 }}>−{fmtPrice(couponDiscount)}</span>
                                     </div>
                                 )}
                                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#6b7280" }}>
                                     <span>Phí vận chuyển</span>
-                                    <span style={{ fontWeight: 600, color: "#16a34a" }}>Miễn phí</span>
+                                    {order.shippingFee === 0
+                                        ? <span style={{ fontWeight: 600, color: "#16a34a" }}>Miễn phí</span>
+                                        : <span style={{ fontWeight: 600 }}>{fmtPrice(order.shippingFee)}</span>}
                                 </div>
                                 <div style={{ height: 1, background: "var(--border)" }} />
                                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 17, fontWeight: 800 }}>

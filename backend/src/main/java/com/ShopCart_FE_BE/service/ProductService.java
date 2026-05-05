@@ -10,12 +10,11 @@ import com.ShopCart_FE_BE.repository.ProductRepository;
 
 @Service
 public class ProductService {
-    
+
     private final ProductRepository productRepository;
 
     public ProductService(
-        ProductRepository productRepository
-    ) {
+            ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
@@ -23,15 +22,7 @@ public class ProductService {
         return this.productRepository.findAll();
     }
 
-    public List<ProductEntity> getAllProductsById(List<Long> ids) {
-        return this.productRepository.findAllById(ids);
-    }
-
     public ProductEntity getProductById(Long productId) {
         return productRepository.findById(productId).orElseThrow(() -> new NotFoundResource("Không tìm thấy sản phẩm"));
-    }
-
-    public ProductEntity saveProduct(ProductEntity productEntity) {
-        return productRepository.save(productEntity);
     }
 }

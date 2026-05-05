@@ -32,10 +32,9 @@ public class AuthController {
     private JwtUtils jwtUtils;
 
     public AuthController(
-        UserService userService,
-        AuthenticationManager authenticationManager,
-        JwtUtils jwtUtils
-    ) {
+            UserService userService,
+            AuthenticationManager authenticationManager,
+            JwtUtils jwtUtils) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
@@ -44,27 +43,22 @@ public class AuthController {
     @PostMapping("register")
     public ResponseEntity<Response<UserDto>> register(@Valid @RequestBody RegisterRequest request) {
         UserEntity user = this.userService.register(request);
-        
-        Response<UserDto> response = ResponseHelper.Success(
-            new UserDto(user.getId(), user.getFullName(), user.getEmail())
-        );
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(ResponseHelper.Success(
+                new UserDto(user.getId(), user.getFullName(), user.getEmail())));
     }
 
     @PostMapping("login")
     public ResponseEntity<Response<JwtDto>> login(
-        @Valid @RequestBody LoginRequest request,
-        HttpServletResponse httpServletResponse
-    ) {
+            @Valid @RequestBody LoginRequest request,
+            HttpServletResponse httpServletResponse) {
         Authentication authentication = this.authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         JwtDto token = this.jwtUtils.generateJwtToken(authentication);
         ResponseCookie responseCookie = this.jwtUtils.setStateCookie(token.getToken());
         httpServletResponse.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
-        Response<JwtDto> response = ResponseHelper.Success(token);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseHelper.Success(token));
     }
 }

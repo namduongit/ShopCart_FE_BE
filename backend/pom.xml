@@ -79,6 +79,11 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20231013</version>
+		</dependency>
 		<!-- Development Tools -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

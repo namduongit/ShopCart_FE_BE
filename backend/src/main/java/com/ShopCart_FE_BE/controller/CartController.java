@@ -35,29 +35,34 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    private CartDto toCartDto(CartEntity cartEntity) {
+        return new CartDto(
+                cartEntity.getId(),
+                cartEntity.getQuantity(),
+                cartEntity.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartEntity.getQuantity())),
+
+                new CartProductDto(
+                        cartEntity.getProductEntity().getId(),
+                        cartEntity.getProductEntity().getMainImageUrl(),
+                        cartEntity.getProductEntity().getName(),
+                        cartEntity.getProductEntity().getPrice(),
+                        cartEntity.getProductEntity().getStatus().toString()));
+    }
+
+    private List<CartDto> toCartDtos(List<CartEntity> cartEntities) {
+        return cartEntities.stream().map(this::toCartDto).toList();
+    }
+
     /**
      * Get cart detail from user
+     * 
      */
     @GetMapping("")
     public ResponseEntity<Response<List<CartDto>>> getCartDetail(
             @AuthenticationPrincipal UserDetailsImp userDetailsImp) {
         List<CartEntity> cartEntities = this.cartService.getAllCartsByUserId(userDetailsImp.getId());
 
-        Response<List<CartDto>> response = ResponseHelper.Success(cartEntities.stream().map(cartDto -> {
-            return new CartDto(
-                    cartDto.getId(),
-                    cartDto.getQuantity(),
-                    cartDto.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartDto.getQuantity())),
-
-                    new CartProductDto(
-                            cartDto.getProductEntity().getId(),
-                            cartDto.getProductEntity().getMainImageUrl(),
-                            cartDto.getProductEntity().getName(),
-                            cartDto.getProductEntity().getPrice(),
-                            cartDto.getProductEntity().getStatus().toString()));
-        }).toList());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseHelper.Success(toCartDtos(cartEntities)));
     }
 
     /**
@@ -76,18 +81,8 @@ public class CartController {
             @Valid @RequestBody AddToCartRequest request) {
 
         CartEntity cartEntity = this.cartService.addToCart(userDetailsImp.getId(), request);
-        Response<CartDto> response = ResponseHelper.Success(new CartDto(
-                cartEntity.getId(),
-                cartEntity.getQuantity(),
-                cartEntity.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartEntity.getQuantity())),
-                new CartProductDto(
-                        cartEntity.getProductEntity().getId(),
-                        cartEntity.getProductEntity().getMainImageUrl(),
-                        cartEntity.getProductEntity().getName(),
-                        cartEntity.getProductEntity().getPrice(),
-                        cartEntity.getProductEntity().getStatus().toString())));
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseHelper.Success(toCartDto(cartEntity)));
     }
 
     /**
@@ -108,18 +103,8 @@ public class CartController {
         if (cartEntity == null) {
             return ResponseEntity.ok(ResponseHelper.Success(null));
         }
-        Response<CartDto> response = ResponseHelper.Success(new CartDto(
-                cartEntity.getId(),
-                cartEntity.getQuantity(),
-                cartEntity.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartEntity.getQuantity())),
-                new CartProductDto(
-                        cartEntity.getProductEntity().getId(),
-                        cartEntity.getProductEntity().getMainImageUrl(),
-                        cartEntity.getProductEntity().getName(),
-                        cartEntity.getProductEntity().getPrice(),
-                        cartEntity.getProductEntity().getStatus().toString())));
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseHelper.Success(toCartDto(cartEntity)));
     }
 
     @DeleteMapping("clear")

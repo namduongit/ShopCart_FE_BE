@@ -8,8 +8,8 @@ INSERT INTO products (
 
 -- 1. Dell XPS 15
 (
-    'https://example.com/images/dell-xps-15-main.jpg',
-    ARRAY['https://example.com/images/dell-xps-15-1.jpg','https://example.com/images/dell-xps-15-2.jpg','https://example.com/images/dell-xps-15-3.jpg'],
+    'https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_9__1_43.png',
+    ARRAY['https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_8__1_26.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_3_15.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_1__1_61.png'],
     'Dell XPS 15 9530',
     'Laptop cao cấp Dell XPS 15 với màn hình OLED sắc nét, hiệu năng mạnh mẽ cho chuyên gia sáng tạo.',
     'dell-xps-15-9530',
@@ -34,8 +34,8 @@ INSERT INTO products (
 
 -- 2. MacBook Pro 14
 (
-    'https://example.com/images/macbook-pro-14-main.jpg',
-    ARRAY['https://example.com/images/macbook-pro-14-1.jpg','https://example.com/images/macbook-pro-14-2.jpg','https://example.com/images/macbook-pro-14-3.jpg'],
+    'https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_2__11.png',
+    ARRAY['https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_3__9.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_4__9.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_5__11_2.png'],
     'Apple MacBook Pro 14 inch M3 Pro',
     'MacBook Pro 14 inch chip M3 Pro - hiệu năng vượt trội, thời lượng pin cả ngày, màn hình Liquid Retina XDR.',
     'apple-macbook-pro-14-m3-pro',
@@ -60,8 +60,8 @@ INSERT INTO products (
 
 -- 3. ASUS ROG Strix G16
 (
-    'https://example.com/images/asus-rog-strix-g16-main.jpg',
-    ARRAY['https://example.com/images/asus-rog-strix-g16-1.jpg','https://example.com/images/asus-rog-strix-g16-2.jpg','https://example.com/images/asus-rog-strix-g16-3.jpg'],
+    'https://cdn2.cellphones.com.vn/x/media/catalog/product/l/a/laptop_asus_rog_strix_g16_g614ph-s5101w_-_3.png',
+    ARRAY['https://cdn2.cellphones.com.vn/x/media/catalog/product/s/s/ssss_2__72.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/s/s/ssss_1__76.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/s/s/ssss_4__64.png'],
     'ASUS ROG Strix G16 2024',
     'Laptop gaming ASUS ROG Strix G16 với chip Intel thế hệ mới, RTX 4070, màn hình 240Hz chiến game mượt mà.',
     'asus-rog-strix-g16-2024',
@@ -87,8 +87,8 @@ INSERT INTO products (
 
 -- 4. Lenovo ThinkPad X1 Carbon
 (
-    'https://example.com/images/thinkpad-x1-carbon-main.jpg',
-    ARRAY['https://example.com/images/thinkpad-x1-carbon-1.jpg','https://example.com/images/thinkpad-x1-carbon-2.jpg','https://example.com/images/thinkpad-x1-carbon-3.jpg'],
+    'https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_-_2023-05-18t203401.618.png',
+    ARRAY['https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_-_2023-05-18t203620.127.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_-_2023-05-18t203411.613.png','https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_-_2023-05-18t203507.247.png'],
     'Lenovo ThinkPad X1 Carbon Gen 11',
     'Laptop doanh nghiệp siêu mỏng nhẹ ThinkPad X1 Carbon, bền bỉ chuẩn MIL-SPEC, bảo mật tuyệt đối.',
     'lenovo-thinkpad-x1-carbon-gen11',

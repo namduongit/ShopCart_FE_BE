@@ -32,13 +32,13 @@ public class CouponController {
         boolean isValid = isActive && notExpired;
 
         return new CouponDto(
-            entity.getId(),
-            entity.getName(),
-            entity.getValue(),
-            entity.getStatus().toString(),
-            entity.getExpiryDate(),
-            isValid
-        );
+                entity.getId(),
+                entity.getName(),
+                entity.getValue(),
+                entity.getStatus().toString(),
+                entity.getExpiryDate(),
+                entity.getMinimumPurchaseAmount(),
+                isValid);
     }
 
     @GetMapping("")
@@ -46,25 +46,22 @@ public class CouponController {
         List<CouponEntity> coupons = this.couponService.getAllCoupons();
 
         List<CouponDto> couponDtos = coupons.stream()
-            .map(this::toCouponDto)
-            .toList();
+                .map(this::toCouponDto)
+                .toList();
 
         return ResponseEntity.ok(ResponseHelper.Success(couponDtos));
     }
 
-
     @GetMapping("{code}")
     public ResponseEntity<Response<CouponDto>> getCouponByCode(
-        @PathVariable String code
-    ) {
+            @PathVariable String code) {
         CouponEntity couponEntity = this.couponService.getCouponByName(code);
         return ResponseEntity.ok(ResponseHelper.Success(toCouponDto(couponEntity)));
     }
 
     @GetMapping("{code}/check")
     public ResponseEntity<Response<CouponDto>> checkCoupon(
-        @PathVariable String code
-    ) {
+            @PathVariable String code) {
         CouponEntity couponEntity = this.couponService.checkCouponValid(code);
         return ResponseEntity.ok(ResponseHelper.Success(toCouponDto(couponEntity)));
     }

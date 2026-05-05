@@ -29,87 +29,99 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/purchases/")
 public class PurchaseController {
 
-    private final OrderService orderService;
+        private final OrderService orderService;
 
-    public PurchaseController(
-        OrderService orderService
-    ) {
-        this.orderService = orderService;
-    }
-
-    private OrderDto toOrderDto(OrderEntity orderEntity) {
-        OrderCouponDto couponDto = null;
-        if (orderEntity.getCouponEntity() != null) {
-            couponDto = new OrderCouponDto(
-                orderEntity.getCouponEntity().getId(),
-                orderEntity.getCouponEntity().getName(),
-                orderEntity.getCouponEntity().getValue()
-            );
+        public PurchaseController(
+                        OrderService orderService) {
+                this.orderService = orderService;
         }
 
-        UserDto userDto = new UserDto(
-            orderEntity.getUserEntity().getId(),
-            orderEntity.getUserEntity().getFullName(),
-            orderEntity.getUserEntity().getEmail()
-        );
+        private OrderDto toOrderDto(OrderEntity orderEntity) {
+                OrderCouponDto couponDto = null;
+                if (orderEntity.getCouponEntity() != null) {
+                        couponDto = new OrderCouponDto(
+                                        orderEntity.getCouponEntity().getId(),
+                                        orderEntity.getCouponEntity().getName(),
+                                        orderEntity.getCouponEntity().getValue());
+                }
 
-        List<OrderItemDto> items = orderEntity.getOrderItemEntities().stream().map(item ->
-            new OrderItemDto(
-                item.getId(),
-                new OrderItemProductDto(
-                    item.getProductEntity().getId(),
-                    item.getProductEntity().getMainImageUrl(),
-                    item.getProductEntity().getName(),
-                    item.getProductEntity().getPrice(),
-                    item.getProductEntity().getStatus().toString()
-                ),
-                item.getQuantity(),
-                item.getTotal()
-            )
-        ).toList();
+                UserDto userDto = new UserDto(
+                                orderEntity.getUserEntity().getId(),
+                                orderEntity.getUserEntity().getFullName(),
+                                orderEntity.getUserEntity().getEmail());
 
-        return new OrderDto(
-            orderEntity.getId(),
-            orderEntity.getFullName(),
-            orderEntity.getAddress(),
-            orderEntity.getStatus().toString(),
-            orderEntity.getTotalAmount(),
-            orderEntity.getTotalQuantity(),
-            userDto,
-            items,
-            couponDto
-        );
-    }
+                List<OrderItemDto> items = orderEntity.getOrderItemEntities().stream().map(item -> new OrderItemDto(
+                                item.getId(),
+                                new OrderItemProductDto(
+                                                item.getProductEntity().getId(),
+                                                item.getProductEntity().getMainImageUrl(),
+                                                item.getProductEntity().getName(),
+                                                item.getProductEntity().getPrice(),
+                                                item.getProductEntity().getStatus().toString()),
+                                item.getQuantity(),
+                                item.getTotal())).toList();
 
-    @PostMapping("")
-    public ResponseEntity<Response<OrderDto>> makePurchase(
-        @AuthenticationPrincipal UserDetailsImp userDetailsImp,
-        @Valid @RequestBody CreatePurchaseRequest request
-    ) {
-        OrderEntity orderEntity = this.orderService.makePurchase(userDetailsImp.getId(), request);
-        Response<OrderDto> response = ResponseHelper.Created(toOrderDto(orderEntity));
-        return ResponseEntity.ok(response);
-    }
+                return new OrderDto(
+                                orderEntity.getId(),
+                                orderEntity.getFullName(),
+                                orderEntity.getAddress(),
+                                orderEntity.getStatus().toString(),
+                                orderEntity.getPaymentMethod().toString(),
+                                orderEntity.getPaymentStatus().toString(),
+                                orderEntity.getTotalAmount(),
+                                orderEntity.getShippingFee(),
+                                orderEntity.getTotalQuantity(),
+                                userDto,
+                                items,
+                                couponDto);
+        }
 
-    @GetMapping("")
-    public ResponseEntity<Response<List<OrderDto>>> getMyOrders(
-        @AuthenticationPrincipal UserDetailsImp userDetailsImp
-    ) {
-        List<OrderEntity> orders = this.orderService.getOrdersByUserId(userDetailsImp.getId());
+        /**
+         * Make a purcharse
+         * 
+         * @param userDetailsImp
+         * @param request
+         * @return
+         */
+        @PostMapping("")
+        public ResponseEntity<Response<OrderDto>> makePurchase(
+                        @AuthenticationPrincipal UserDetailsImp userDetailsImp,
+                        @Valid @RequestBody CreatePurchaseRequest request) {
+                OrderEntity orderEntity = this.orderService.makePurchase(userDetailsImp.getId(), request);
+                Response<OrderDto> response = ResponseHelper.Created(toOrderDto(orderEntity));
+                return ResponseEntity.ok(response);
+        }
 
-        List<OrderDto> orderDtos = orders.stream()
-            .map(this::toOrderDto)
-            .toList();
+        /**
+         * Get all orders by user
+         * 
+         * @param userDetailsImp
+         * @return
+         */
+        @GetMapping("")
+        public ResponseEntity<Response<List<OrderDto>>> getMyOrders(
+                        @AuthenticationPrincipal UserDetailsImp userDetailsImp) {
+                List<OrderEntity> orders = this.orderService.getOrdersByUserId(userDetailsImp.getId());
 
-        return ResponseEntity.ok(ResponseHelper.Success(orderDtos));
-    }
+                List<OrderDto> orderDtos = orders.stream()
+                                .map(this::toOrderDto)
+                                .toList();
 
-    @GetMapping("{orderId}")
-    public ResponseEntity<Response<OrderDto>> getOrderById(
-        @AuthenticationPrincipal UserDetailsImp userDetailsImp,
-        @PathVariable Long orderId
-    ) {
-        OrderEntity orderEntity = this.orderService.getOrderById(userDetailsImp.getId(), orderId);
-        return ResponseEntity.ok(ResponseHelper.Success(toOrderDto(orderEntity)));
-    }
+                return ResponseEntity.ok(ResponseHelper.Success(orderDtos));
+        }
+
+        /**
+         * Get order by id
+         * 
+         * @param userDetailsImp
+         * @param orderId
+         * @return
+         */
+        @GetMapping("{orderId}")
+        public ResponseEntity<Response<OrderDto>> getOrderById(
+                        @AuthenticationPrincipal UserDetailsImp userDetailsImp,
+                        @PathVariable Long orderId) {
+                OrderEntity orderEntity = this.orderService.getOrderById(userDetailsImp.getId(), orderId);
+                return ResponseEntity.ok(ResponseHelper.Success(toOrderDto(orderEntity)));
+        }
 }

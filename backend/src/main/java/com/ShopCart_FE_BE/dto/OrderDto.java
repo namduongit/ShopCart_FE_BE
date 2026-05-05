@@ -17,7 +17,11 @@ public class OrderDto {
     private String address;
     private String status;
 
+    private String paymentMethod;
+    private String paymentStatus;
+
     private BigDecimal totalAmount;
+    private BigDecimal shippingFee;
     private Integer totalQuantity;
 
     private UserDto user;

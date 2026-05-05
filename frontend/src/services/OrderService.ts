@@ -5,8 +5,10 @@ import type { Response } from "../libs/response";
 const OrderService = {
     /** Tạo đơn hàng mới từ giỏ hàng */
     async CreateOrder(data: {
-        fullName: string;
+        fullName?: string;
+        phone: string;
         address: string;
+        paymentMethod: string,
         couponCode?: string;
         items: { productId: number; quantity: number }[];
     }) {

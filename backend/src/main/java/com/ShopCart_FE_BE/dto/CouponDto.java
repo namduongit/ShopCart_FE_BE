@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor  
+@NoArgsConstructor
 @AllArgsConstructor
 public class CouponDto {
     private Long id;
@@ -16,6 +16,7 @@ public class CouponDto {
     private BigDecimal value;
     private String status;
     private Date expiryDate;
-    /** true nếu coupon còn hiệu lực (chưa hết hạn và status = ACTIVE) */
+    private BigDecimal minimumPurchaseAmount;
+
     private Boolean isValid;
 }

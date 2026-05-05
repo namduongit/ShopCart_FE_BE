@@ -39,7 +39,10 @@ public class CouponEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CouponStatus status;
-    
+
+    @Column(nullable = false)
+    private BigDecimal minimumPurchaseAmount;
+
     @Column(nullable = false)
     private Date expiryDate;
 

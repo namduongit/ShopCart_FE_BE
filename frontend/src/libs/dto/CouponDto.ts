@@ -4,5 +4,6 @@ export type CouponDto = {
     value: number;
     status: string;
     expiryDate: string;
+    minimumPurchaseAmount: number;
     isValid: boolean;
 }

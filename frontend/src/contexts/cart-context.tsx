@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { CartDto } from "../libs/dto/CartDto";
-import CartService from "../services/cartService";
+import CartService from "../services/CartService";
 import { AuthContext } from "./auth-context";
 import { useExecute } from "../hooks/useExecute";
 

@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,16 +20,24 @@ public class CreatePurchaseRequest {
     @Valid
     private List<PurchaseItem> items;
 
+    // Optional field
+    private String fullName;
+
+    @NotNull(message = "Yêu cầu gửi số điện thoại")
+    @NotBlank(message = "Số điện thoại không được để trống")
+    @Size(min = 10, max = 10, message = "Số điện thoại phải có 10 số")
+    private String phone;
+
     @NotNull(message = "Yêu cầu gửi địa chỉ")
     @NotBlank(message = "Địa chỉ nhận hàng không được để trống")
     private String address;
 
-    // Optinal - Can be null
-    // @NotBlank(message = "Mã giảm giá không được để trống")
-    private String couponCode;
+    @NotNull(message = "Yêu cầu gửi phương thức thanh toán")
+    @Pattern(regexp = "COD|MOMO", message = "Phương thức thanh toán không hợp lệ")
+    private String paymentMethod;
 
-    // Optional field
-    private String fullName;
+    // Optinal - Can be null
+    private String couponCode;
 
     @Data
     @NoArgsConstructor
