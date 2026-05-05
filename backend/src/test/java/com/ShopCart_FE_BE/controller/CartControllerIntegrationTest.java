@@ -30,6 +30,7 @@ import com.ShopCart_FE_BE.entity.InventoryEntity;
 import com.ShopCart_FE_BE.entity.ProductEntity;
 import com.ShopCart_FE_BE.entity.types.ProductStatus;
 import com.ShopCart_FE_BE.exception.InvalidException;
+import com.ShopCart_FE_BE.exception.NotFoundResource;
 import com.ShopCart_FE_BE.request.AddToCartRequest;
 
 import com.ShopCart_FE_BE.service.CartService;
@@ -211,5 +212,77 @@ public class CartControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)).header("Origin","http://localhost:5173")).andExpect(status().isOk()).andExpect(header().exists("Access-Control-Allow-Origin")).andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
 
+        }
+
+        @Test
+        @WithMockUser(username = "user@example.com")
+        @DisplayName("TC7: POST /api/carts/add - Thieu ma san pham")
+        void testAddToCartWithMissingProductId() throws Exception {
+                AddToCartRequest request = AddToCartRequest.builder().quantity(2).build();
+
+                mockMvc.perform(post("/api/carts/add").cookie(new Cookie("access_token", this.token)).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.status").value(400))
+                                .andExpect(jsonPath("$.success").value(false))
+                                .andExpect(jsonPath("$.message").value("Bad Request"))
+                                .andExpect(jsonPath("$.errors.productId").value("Yêu cầu gửi mã sản phẩm"))
+                                .andExpect(jsonPath("$.data").doesNotExist());
+
+        }
+
+        @Test
+        @WithMockUser(username = "user@example.com")
+        @DisplayName("TC8: POST /api/carts/add - Thieu so luong")
+        void testAddToCartWithMissingQuantity() throws Exception {2
+                AddToCartRequest request = AddToCartRequest.builder().productId(1L).build();
+
+                mockMvc.perform(post("/api/carts/add").cookie(new Cookie("access_token", this.token)).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.status").value(400))
+                                .andExpect(jsonPath("$.success").value(false))
+                                .andExpect(jsonPath("$.message").value("Bad Request"))
+                                .andExpect(jsonPath("$.errors.quantity").value("Yêu cầu gửi số lượng"))
+                                .andExpect(jsonPath("$.data").doesNotExist());
+
+        }
+
+        @Test
+        @WithMockUser(username = "user@example.com")
+        @DisplayName("TC9: POST /api/carts/add - Sai dinh dang JSON")
+        void testAddToCartWithMalformedJson() throws Exception {
+                mockMvc.perform(post("/api/carts/add").cookie(new Cookie("access_token", this.token)).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"productId\":1,\"quantity\":"))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.status").value(400))
+                                .andExpect(jsonPath("$.success").value(false))
+                                .andExpect(jsonPath("$.message").value("Bad Request"))
+                                .andExpect(jsonPath("$.errors").value("Invalid request body format"))
+                                .andExpect(jsonPath("$.data").doesNotExist());
+
+        }
+
+        @Test
+        @WithMockUser(username = "user@example.com")
+        @DisplayName("TC10: POST /api/carts/add - San pham khong ton tai")
+        void testAddToCartWithProductNotFound() throws Exception {
+                AddToCartRequest request = AddToCartRequest.builder().productId(999L).quantity(1).build();
+
+                when(cartService.addToCart(anyLong(), any()))
+                                .thenThrow(new NotFoundResource("Không tìm thấy sản phẩm"));
+
+                mockMvc.perform(post("/api/carts/add").cookie(new Cookie("access_token", this.token)).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.status").value(400))
+                                .andExpect(jsonPath("$.success").value(false))
+                                .andExpect(jsonPath("$.message").value("Bad Request"))
+                                .andExpect(jsonPath("$.errors").value("Không tìm thấy sản phẩm"))
+                                .andExpect(jsonPath("$.data").doesNotExist());
         }
 }
