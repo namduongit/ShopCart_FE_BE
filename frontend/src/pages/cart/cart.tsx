@@ -67,7 +67,7 @@ const CartPage = () => {
 
                 {/* Empty state */}
                 {!loading && cartItems.length === 0 && (
-                    <div style={{ textAlign: "center", padding: "80px 0" }}>
+                    <div style={{ textAlign: "center", padding: "80px 0" }} data-testid="empty-cart-message">
                         <i className="fa-solid fa-basket-shopping" style={{ fontSize: 56, color: "#d1d5db", display: "block", marginBottom: 16 }} />
                         <h2 style={{ fontSize: 18, fontWeight: 700, color: "#374151", margin: "0 0 8px" }}>Giỏ hàng trống</h2>
                         <p style={{ color: "#9ca3af", marginBottom: 24 }}>Bạn chưa có sản phẩm nào trong giỏ hàng</p>

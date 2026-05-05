@@ -6,6 +6,6 @@ type Response<T> = {
     data: T;
 }
 
-type ErrorType = string | string[] | Record<string, any>;
+type ErrorType = string | string[] | Record<string, any> | null;
 
 export type { Response };

@@ -43,7 +43,7 @@ coverage/
 .env.*.local
 
 # Ignore package-lock and yarn lock if not used
-# package-lock.json
+package-*.json
 yarn.lock
 
 # Ignore backend logs
@@ -56,4 +56,4 @@ backend/.settings/
 
 application.yaml
 volumes/
-docker-compose.yaml
+# docker-compose.yaml
