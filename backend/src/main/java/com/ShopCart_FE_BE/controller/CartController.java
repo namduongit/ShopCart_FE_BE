@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +49,6 @@ public class CartController {
                     cartDto.getQuantity(),
                     cartDto.getProductEntity().getPrice().multiply(BigDecimal.valueOf(cartDto.getQuantity())),
 
-
                     new CartProductDto(
                             cartDto.getProductEntity().getId(),
                             cartDto.getProductEntity().getMainImageUrl(),
@@ -67,7 +67,8 @@ public class CartController {
      * * Require: Check stock of product before add to cart, Calculate total price
      * of cart
      * ! Note: Throw exception in error case (quantity, missing field)
-     * Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+     * Authentication authentication =
+     * SecurityContextHolder.getContext().getAuthentication();
      */
     @PostMapping("add")
     public ResponseEntity<Response<CartDto>> addToCart(
@@ -118,6 +119,15 @@ public class CartController {
                         cartEntity.getProductEntity().getPrice(),
                         cartEntity.getProductEntity().getStatus().toString())));
 
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("clear")
+    public ResponseEntity<Response<?>> removeFromCart(
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp) {
+        this.cartService.clearCart(userDetailsImp.getId());
+
+        Response<CartDto> response = ResponseHelper.Success(null);
         return ResponseEntity.ok(response);
     }
 }

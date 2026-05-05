@@ -10,6 +10,8 @@ import com.ShopCart_FE_BE.entity.UserEntity;
 import com.ShopCart_FE_BE.exception.InvalidException;
 import com.ShopCart_FE_BE.exception.NotFoundResource;
 import com.ShopCart_FE_BE.repository.CartRepository;
+import com.ShopCart_FE_BE.repository.ProductRepository;
+import com.ShopCart_FE_BE.repository.UserRepository;
 import com.ShopCart_FE_BE.request.AddToCartRequest;
 import com.ShopCart_FE_BE.request.RemoveFromCartRequest;
 
@@ -17,16 +19,16 @@ import com.ShopCart_FE_BE.request.RemoveFromCartRequest;
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final ProductService productService;
-    private final UserService userService;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     public CartService(
             CartRepository cartRepository,
-            ProductService productService,
-            UserService userService) {
+            ProductRepository productRepository,
+            UserRepository userRepository) {
         this.cartRepository = cartRepository;
-        this.productService = productService;
-        this.userService = userService;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -53,8 +55,11 @@ public class CartService {
                 .findByUserEntityIdAndProductEntityId(userId, request.getProductId())
                 .orElse(null);
 
-        ProductEntity productEntity = this.productService.getProductById(request.getProductId());
-        UserEntity userEntity = this.userService.getUserById(userId);
+        ProductEntity productEntity = this.productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new NotFoundResource("Không tìm thấy sản phẩm"));
+        UserEntity userEntity = this.userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundResource("Không tìm thấy người dùng"));
+
         if (existCartEntity == null) {
             existCartEntity = new CartEntity();
             existCartEntity.setProductEntity(productEntity);
@@ -110,5 +115,10 @@ public class CartService {
         }
 
         return this.cartRepository.save(existCartEntity);
+    }
+
+    public void clearCart(Long userId) {
+        List<CartEntity> cartEntities = this.cartRepository.findByUserId(userId);
+        this.cartRepository.deleteAll(cartEntities);
     }
 }
