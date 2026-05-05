@@ -30,7 +30,7 @@ public class InventoryService {
 
     // update this method with new checking logic later
     public boolean isAvailable(Long productId, int quantity) {
-        if (quantity <= 0) throw new InvalidException("Quantity must be greater than 0");
+        if (quantity <= 0) throw new InvalidException("Số lượng phải lớn hơn 0");
         
         return this.getAvailableQuantity(productId) >= quantity;
     }
@@ -40,9 +40,9 @@ public class InventoryService {
                 .findByProductEntityId(productId)
                 .orElseThrow(() -> new NotFoundResource("Inventory with id " + productId + " not found"));
     
-        if (quantity <= 0) throw new InvalidException("Quantity must be greater than 0");
+        if (quantity <= 0) throw new InvalidException("Số lượng phải lớn hơn 0");
 
-        if (inv.getStockQuantity() < quantity) throw new InvalidException("Not enough stock");
+        if (inv.getStockQuantity() < quantity) throw new InvalidException("Không đủ hàng tồn kho");
 
         inv.setStockQuantity(inv.getStockQuantity() - quantity);
 

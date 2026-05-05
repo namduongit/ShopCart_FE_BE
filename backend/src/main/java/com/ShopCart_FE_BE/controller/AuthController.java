@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/w-version/auth/")
+@RequestMapping("/api/auth/")
 public class AuthController {
     private UserService userService;
     private AuthenticationManager authenticationManager;

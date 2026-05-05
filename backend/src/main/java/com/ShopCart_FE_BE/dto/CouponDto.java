@@ -1,5 +1,6 @@
 package com.ShopCart_FE_BE.dto;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 import lombok.AllArgsConstructor;
@@ -12,6 +13,9 @@ import lombok.NoArgsConstructor;
 public class CouponDto {
     private Long id;
     private String name;
+    private BigDecimal value;
     private String status;
-    private Date expirateDate;
+    private Date expiryDate;
+    /** true nếu coupon còn hiệu lực (chưa hết hạn và status = ACTIVE) */
+    private Boolean isValid;
 }

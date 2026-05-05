@@ -16,7 +16,7 @@ import com.ShopCart_FE_BE.service.ProductService;
 import com.ShopCart_FE_BE.utils.ResponseHelper;
 
 @RestController
-@RequestMapping("/w-version/api/products/")
+@RequestMapping("/api/products/")
 public class ProductController {
     private final ProductService productService;
 

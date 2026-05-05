@@ -13,7 +13,7 @@ import com.ShopCart_FE_BE.service.InventoryService;
 import com.ShopCart_FE_BE.utils.ResponseHelper;
 
 @RestController
-@RequestMapping("/w-version/inventory")
+@RequestMapping("/api/inventory")
 public class InventoryController {
     
 
@@ -23,16 +23,16 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    @GetMapping("/{productId}/check")
-    public ResponseEntity<Response<Boolean>> checkStock(
-        @PathVariable Long productId, 
-        @RequestParam int quantity
-    ) {
-        boolean available = this.inventoryService.isAvailable(productId, quantity);
+    // @GetMapping("/{productId}/check")
+    // public ResponseEntity<Response<Boolean>> checkStock(
+    //     @PathVariable Long productId, 
+    //     @RequestParam int quantity
+    // ) {
+    //     boolean available = this.inventoryService.isAvailable(productId, quantity);
 
-        Response<Boolean> res = ResponseHelper.Success(available);
-        return ResponseEntity.ok(res);
-    }
+    //     Response<Boolean> res = ResponseHelper.Success(available);
+    //     return ResponseEntity.ok(res);
+    // }
 
     @PutMapping("/{productId}/decrease")
     public ResponseEntity<Response<Void>> decreaseStock(

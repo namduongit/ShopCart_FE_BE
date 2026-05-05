@@ -23,6 +23,10 @@ public class ProductService {
         return this.productRepository.findAll();
     }
 
+    public List<ProductEntity> getAllProductsById(List<Long> ids) {
+        return this.productRepository.findAllById(ids);
+    }
+
     public ProductEntity getProductById(Long productId) {
         return productRepository.findById(productId).orElseThrow(() -> new NotFoundResource("Không tìm thấy sản phẩm"));
     }

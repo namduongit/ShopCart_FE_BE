@@ -1,5 +1,37 @@
-{"properties": [{
-  "name": "env.jwt_secret",
-  "type": "java.lang.String",
-  "description": "A description for 'env.jwt_secret'"
-}]}
+{"properties": [
+  {
+    "name": "env.jwt_secret",
+    "type": "java.lang.String",
+    "description": "A description for 'env.jwt_secret'"
+  },
+  {
+    "name": "env.email.smtp_host",
+    "type": "java.lang.String",
+    "description": "A description for 'env.email.smtp_host'"
+  },
+  {
+    "name": "env.email.smtp_port",
+    "type": "java.lang.String",
+    "description": "A description for 'env.email.smtp_port'"
+  },
+  {
+    "name": "env.email.smtp_auth",
+    "type": "java.lang.String",
+    "description": "A description for 'env.email.smtp_auth'"
+  },
+  {
+    "name": "env.email.smtp_starttls_enable",
+    "type": "java.lang.String",
+    "description": "A description for 'env.email.smtp_starttls_enable'"
+  },
+  {
+    "name": "env.email.username",
+    "type": "java.lang.String",
+    "description": "A description for 'env.email.username'"
+  },
+  {
+    "name": "env.email.password",
+    "type": "java.lang.String",
+    "description": "A description for 'env.email.password'"
+  }
+]}
