@@ -39,7 +39,7 @@ const CartPage = () => {
             await cartContext?.removeFromCart(productId, currentQty);
             notificationContext?.showToast({ id: Date.now(), type: "success", title: "Đã xóa", message: "Sản phẩm đã được xóa khỏi giỏ hàng" });
         } else if (delta > 0) {
-            await cartContext?.addToCart(productId, delta);
+                await cartContext?.addToCart(productId, delta);
         } else {
             await cartContext?.removeFromCart(productId, Math.abs(delta));
         }
@@ -155,7 +155,7 @@ const CartPage = () => {
 
 
                 {cartItems.length > 0 && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 24, alignItems: "start" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 24, alignItems: "start" }} data-testid="list-carts-product">
                         {/* Cart items list */}
                         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                             {cartItems.map(item => (
@@ -206,6 +206,7 @@ const CartPage = () => {
                                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                         <div style={{ display: "flex", alignItems: "center", border: "1.5px solid var(--border)", borderRadius: 7, overflow: "hidden" }}>
                                             <button
+                                            data-testid="reduce-quantity"
                                                 onClick={() => handleChangeQty(item.product.id, item.quantity, -1)}
                                                 style={{ width: 32, height: 32, border: "none", background: "#fff", cursor: "pointer", fontSize: 14, borderRight: "1px solid var(--border)" }}
                                             >−</button>
@@ -213,12 +214,14 @@ const CartPage = () => {
                                                 {item.quantity}
                                             </span>
                                             <button
+                                            data-testid="increase-quantity"
                                                 onClick={() => handleChangeQty(item.product.id, item.quantity, 1)}
                                                 style={{ width: 32, height: 32, border: "none", background: "#fff", cursor: "pointer", fontSize: 14, borderLeft: "1px solid var(--border)" }}
                                             >+</button>
                                         </div>
 
                                         <button
+                                        data-testid="remove-product"
                                             onClick={() => handleRemoveItem(item.product.id, item.quantity)}
                                             title="Xóa sản phẩm"
                                             style={{

@@ -3,7 +3,7 @@ type Response<T> = {
     success: boolean;
     message: string;
     errors: ErrorType;
-    data: T;
+    data: T | null;
 }
 
 type ErrorType = string | string[] | Record<string, any> | null;

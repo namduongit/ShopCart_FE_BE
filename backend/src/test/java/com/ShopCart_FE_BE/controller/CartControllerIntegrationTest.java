@@ -235,7 +235,7 @@ public class CartControllerIntegrationTest {
         @Test
         @WithMockUser(username = "user@example.com")
         @DisplayName("TC8: POST /api/carts/add - Thieu so luong")
-        void testAddToCartWithMissingQuantity() throws Exception {2
+        void testAddToCartWithMissingQuantity() throws Exception {
                 AddToCartRequest request = AddToCartRequest.builder().productId(1L).build();
 
                 mockMvc.perform(post("/api/carts/add").cookie(new Cookie("access_token", this.token)).with(csrf())

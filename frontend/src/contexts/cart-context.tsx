@@ -8,7 +8,7 @@ interface CartContextType {
     cartItems: CartDto[];
     loading: boolean;
     /** Thêm sản phẩm vào giỏ (gọi API add, sau đó reload) */
-    addToCart: (productId: number, quantity: number) => Promise<void>;
+        addToCart: (productId: number, quantity: number) => Promise<void>;
     /** Giảm/xóa sản phẩm khỏi giỏ (gọi API remove, sau đó reload) */
     removeFromCart: (productId: number, quantity: number) => Promise<void>;
     /** Xóa toàn bộ giỏ hàng trên server và client */

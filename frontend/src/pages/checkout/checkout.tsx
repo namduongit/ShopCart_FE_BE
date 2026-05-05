@@ -112,7 +112,7 @@ const CheckoutPage = () => {
     };
 
     return (
-        <div style={{ background: "#f9fafb", minHeight: "100vh", padding: "32px 0" }}>
+        <div style={{ background: "#f9fafb", minHeight: "100vh", padding: "32px 0" }} data-testid='checkout-page'>
             <div className="container-main">
                 <nav style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#6b7280", marginBottom: 24 }}>
                     <Link to="/" style={{ color: "#2563eb" }}>Trang chủ</Link>

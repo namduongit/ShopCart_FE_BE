@@ -75,7 +75,27 @@ export const useExecute = <T>() => {
                     }
                 }
             } else {
+                // Use in mock test
+                /**
+                 * {
+                    status: 400,
+                    success: false,
+                    message: "Bad Request",
+                    errors: "Sản phẩm đang bị khóa",
+                    data: null,
+                    }
+                 */
+                const err: any = error;
+                const errMessage = err.errors;
 
+                if (typeof (errMessage) === "string") {
+                    notificationContext?.showToast({
+                        id: Date.now(),
+                        type: "warning",
+                        title: "Cảnh báo",
+                        message: errMessage,
+                    });
+                }
             }
         }
         finally {
