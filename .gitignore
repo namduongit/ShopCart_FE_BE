@@ -56,4 +56,7 @@ backend/.settings/
 
 application.yaml
 volumes/
-# docker-compose.yaml
+
+docker-compose.yaml
+
+.codex
