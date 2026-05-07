@@ -19,11 +19,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.ShopCart_FE_BE.config.ForbiddenEntryPoint;
+import com.ShopCart_FE_BE.config.SecurityConfig;
+import com.ShopCart_FE_BE.config.UnauthorizedEntryPoint;
 import com.ShopCart_FE_BE.config.UserDetailsImp;
 import com.ShopCart_FE_BE.entity.CartEntity;
 import com.ShopCart_FE_BE.entity.ProductEntity;
@@ -41,6 +45,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 
 @WebMvcTest(CartController.class)
+@Import(SecurityConfig.class)
 @DisplayName("Cart Api Integration Tests")
 public class CartControllerIntegrationTest {
 
@@ -52,6 +57,12 @@ public class CartControllerIntegrationTest {
 
         @MockitoBean
         private CartService cartService;
+
+        @MockitoBean
+        private UnauthorizedEntryPoint unauthorizedEntryPoint;
+
+        @MockitoBean
+        private ForbiddenEntryPoint forbiddenEntryPoint;
 
         @MockitoBean
         private JwtUtils jwtUtils;
@@ -209,7 +220,10 @@ public class CartControllerIntegrationTest {
 
                 mockMvc.perform(post("/api/carts/add").cookie(new Cookie("access_token", this.token)).with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)).header("Origin","http://localhost:5173")).andExpect(status().isOk()).andExpect(header().exists("Access-Control-Allow-Origin")).andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+                                .content(objectMapper.writeValueAsString(request))
+                                .header("Origin", "http://localhost:5173")).andExpect(status().isOk())
+                                .andExpect(header().exists("Access-Control-Allow-Origin"))
+                                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
 
         }
 

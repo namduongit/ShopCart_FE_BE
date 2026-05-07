@@ -25,14 +25,15 @@ public class CreatePurchaseRequest {
     // Optional field
     private String fullName;
 
-    @NotNull(message = "Yêu cầu gửi số điện thoại")
     @NotBlank(message = "Số điện thoại không được để trống")
     @Size(min = 10, max = 10, message = "Số điện thoại phải có 10 số")
-    private String phone;
+    private String phone ;
+
 
     // @NotNull(message = "Yêu cầu gửi địa chỉ")
+
     @NotBlank(message = "Địa chỉ nhận hàng không được để trống")
-    private String address;
+    private String address ;
 
     @NotNull(message = "Yêu cầu gửi phương thức thanh toán")
     @Pattern(regexp = "COD|MOMO", message = "Phương thức thanh toán không hợp lệ")

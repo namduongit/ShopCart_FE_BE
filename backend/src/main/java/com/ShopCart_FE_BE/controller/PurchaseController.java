@@ -2,6 +2,7 @@ package com.ShopCart_FE_BE.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,7 +90,7 @@ public class PurchaseController {
                         @Valid @RequestBody CreatePurchaseRequest request) {
                 OrderEntity orderEntity = this.orderService.makePurchase(userDetailsImp.getId(), request);
                 Response<OrderDto> response = ResponseHelper.Created(toOrderDto(orderEntity));
-                return ResponseEntity.ok(response);
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
 
         /**
