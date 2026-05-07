@@ -301,6 +301,7 @@ const ProductDetailPage = () => {
                         </div>
 
                         <button
+                            id="add-button"
                             onClick={handleAddToCart}
                             disabled={!isActive || isBusy}
                             style={{

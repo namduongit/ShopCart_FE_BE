@@ -10,7 +10,7 @@ interface CartContextType {
     /** Thêm sản phẩm vào giỏ (gọi API add, sau đó reload) */
         addToCart: (productId: number, quantity: number) => Promise<void>;
     /** Giảm/xóa sản phẩm khỏi giỏ (gọi API remove, sau đó reload) */
-    removeFromCart: (productId: number, quantity: number) => Promise<void>;
+    removeFromCart: (productId: number, quantity: number) => Promise<boolean>;
     /** Xóa toàn bộ giỏ hàng trên server và client */
     clearCart: () => Promise<void>;
     /** Tải lại giỏ hàng từ server */
@@ -51,11 +51,13 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
         await fetchCart();
     };
 
-    const removeFromCart = async (productId: number, quantity: number) => {
+    const removeFromCart = async (productId: number, quantity: number): Promise<boolean> => {
         await queryRemoveCart(() => RemoveFromCart({ productId, quantity }), {
             issueNetwork: true,
         });
         await fetchCart();
+
+        return true;
     };
 
     const clearCart = async () => {

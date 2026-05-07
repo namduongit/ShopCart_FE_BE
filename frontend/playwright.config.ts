@@ -7,28 +7,45 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: [['html', { host: '0.0.0.0', port: 9323 }]],
   use: {
-    trace: 'on-first-retry',
     baseURL: 'http://localhost:5173',
+    trace: 'on-first-retry',
     actionTimeout: 10000,
     navigationTimeout: 30000,
   },
 
   projects: [
     {
+      name: 'setup',
+      testMatch: '**/setup/authentication.setup.ts',
+    },
+
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/resource/State_Auth.json',
+      },
+      dependencies: ['setup'],
     },
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: 'e2e/resource/State_Auth.json',
+      },
+      dependencies: ['setup'],
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: 'e2e/resource/State_Auth.json',
+      },
+      dependencies: ['setup'],
     },
   ],
 

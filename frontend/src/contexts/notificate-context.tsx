@@ -79,7 +79,7 @@ const NotificateProvider = ({ children }: { children: React.ReactNode }) => {
             {toasts.length > 0 && (
                 <div className="fixed top-5 inset-e-5 w-60 h-15 space-y-2 z-100">
                     {toasts.map((toast, idx) => (
-                        <div key={idx} className={`flex items-center ${getBackgroundColor(toast.type)} 
+                        <div key={idx} className={`toast-component flex items-center ${getBackgroundColor(toast.type)} 
                             left-to-right shadow px-3 py-3 gap-2 border-s-4 ${getBorderColor(toast.type)}`}>
                             <div>
                                 <div className={`w-4 h-4 rounded-full border-4 ${getBorderColor(toast.type)}`}></div>
@@ -94,7 +94,7 @@ const NotificateProvider = ({ children }: { children: React.ReactNode }) => {
                                     </h1>
                                     <button className="text-gray-500" onClick={() => closeToast(toast.id)}>x</button>
                                 </div>
-                                <p className="text-sm">{toast.message}</p>
+                                <p className="toast-component__message text-sm">{toast.message}</p>
                             </div>
                         </div>
                     ))}

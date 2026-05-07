@@ -27,6 +27,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const store: JwtDto = JSON.parse(raw);
             // Coi là đăng nhập nếu có token
             if (store?.token) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
                 setState(store);
                 setIsAuthenticated(true);
             } else {

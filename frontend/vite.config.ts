@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
-   test: {
+  test: {
     environment: 'jsdom'
   }
 })

@@ -33,5 +33,40 @@
     "name": "env.email.password",
     "type": "java.lang.String",
     "description": "A description for 'env.email.password'"
+  },
+  {
+    "name": "env.jwt_secret",
+    "type": "java.lang.String",
+    "description": "A description for 'env.jwt_secret'"
+  },
+  {
+    "name": "env.momo.endpoint",
+    "type": "java.lang.String",
+    "description": "A description for 'env.momo.endpoint'"
+  },
+  {
+    "name": "env.momo.ipn",
+    "type": "java.lang.String",
+    "description": "A description for 'env.momo.ipn'"
+  },
+  {
+    "name": "env.momo.return",
+    "type": "java.lang.String",
+    "description": "A description for 'env.momo.return'"
+  },
+  {
+    "name": "env.momo.partner_code",
+    "type": "java.lang.String",
+    "description": "A description for 'env.momo.partner_code'"
+  },
+  {
+    "name": "env.momo.access_key",
+    "type": "java.lang.String",
+    "description": "A description for 'env.momo.access_key'"
+  },
+  {
+    "name": "env.momo.secret_key",
+    "type": "java.lang.String",
+    "description": "A description for 'env.momo.secret_key'"
   }
 ]}

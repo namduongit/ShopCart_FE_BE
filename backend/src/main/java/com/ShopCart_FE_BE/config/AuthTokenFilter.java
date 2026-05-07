@@ -32,15 +32,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
+            HttpServletRequest req,
+            HttpServletResponse res,
             FilterChain filterChain) throws ServletException, IOException {
 
-        String token = this.extractTokenFromCookie(request);
+        String token = this.extractTokenFromCookie(req);
         System.out.println("Extracted token: " + token);
         // Token is not exist, continue to next filter
         if (token == null) {
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(req, res);
             return;
         }
 
@@ -48,8 +48,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         Claims claims = this.jwtUtils.extractClaims(token);
         if (claims == null) {
             System.out.println("Invalid token - Token will be cleared");
-            this.jwtUtils.clearStateCookie(response);
-            filterChain.doFilter(request, response);
+            // this.jwtUtils.clearStateCookie(res);
+
+            filterChain.doFilter(req, res);
             return;
         }
 
@@ -64,15 +65,19 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         // Set data in context
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // CartController.java for read
         authentication.setDetails(id);
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(req, res);
     }
 
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null)
+    private String extractTokenFromCookie(HttpServletRequest req) {
+        if (req.getCookies() == null) {
             return null;
+        }
 
-        return Arrays.stream(request.getCookies())
+        System.out.println("Run here");
+
+        return Arrays.stream(req.getCookies())
                 .filter(c -> "access_token".equals(c.getName()))
                 .map(Cookie::getValue)
                 .findFirst()
