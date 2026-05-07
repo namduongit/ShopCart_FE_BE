@@ -118,7 +118,7 @@ const OrderDetailPage = () => {
                         <i className={`fa-solid ${statusInfo.icon}`} style={{ fontSize: 12 }} />
                         {statusInfo.label}
                     </span>
-                    <span style={{
+                    <span id="payment-status" style={{
                         padding: "5px 14px", borderRadius: 6, fontSize: 13, fontWeight: 600,
                         color: paymentStatusInfo.color, background: paymentStatusInfo.bg,
                         border: `1px solid ${paymentStatusInfo.border}`,

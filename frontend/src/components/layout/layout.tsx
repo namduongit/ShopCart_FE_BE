@@ -125,7 +125,7 @@ const WebLayout = () => {
                             <i className="fa-solid fa-basket-shopping" style={{ fontSize: "16px" }} />
                             <span style={{ fontWeight: 500 }}>Giỏ hàng</span>
                             {cartCount > 0 && (
-                                <span style={{
+                                <span id="cart-badge" style={{
                                     background: "#dc2626", color: "white",
                                     borderRadius: "100px", fontSize: "11px", fontWeight: 700,
                                     minWidth: "18px", height: "18px", display: "inline-flex",

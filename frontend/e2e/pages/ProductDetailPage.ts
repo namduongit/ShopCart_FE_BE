@@ -9,11 +9,11 @@ export class ProductDetailPage {
         this.addButton = page.locator("#add-button");
     }
 
-    async goto(id: number) {
+    async goToProductDetailPage(id: number) {
         await this.page.goto(`/page/product/${id}`);
     }
 
-    async add() {
+    async addToCart() {
         await this.addButton.click();
     }
 }

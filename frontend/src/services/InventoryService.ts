@@ -13,7 +13,7 @@ export type CheckStockRequest = {
 const InventoryService = {
     async CheckStock(request: CheckStockRequest) {
         const response = await api.post<Response<boolean>>(
-            '/api/inventory/checkStock',
+            '/api/inventories/checkStock',
             request
         );
         return response.data;

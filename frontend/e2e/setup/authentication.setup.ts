@@ -1,16 +1,17 @@
-import { Page, test as setup } from '@playwright/test';
+import { expect, Page, test as setup } from '@playwright/test';
+import LoginPage from '../pages/LoginPage';
+import { LOGIN_SUCCESS } from './script.setup';
 
 setup('authentication', async ({ page }: { page: Page }) => {
-    await page.goto('http://localhost:5173');
+    await page.route("/api/auth/login", route => route.fulfill(LOGIN_SUCCESS));
 
-    await page.evaluate(() => {
-        localStorage.setItem("CART_SHOP", JSON.stringify({
-            "id": 2,
-            "name": "Nguyễn Nam Dương",
-            "email": "nguyennamduong@gmail.com",
-            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW5uYW1kdW9uZzAwMUBnbWFpbC5jb20iLCJpZCI6MiwiZW1haWwiOiJuZ3V5ZW5uYW1kdW9uZzAwMUBnbWFpbC5jb20iLCJuYW1lIjoiTmd1eeG7hW4gTmFtIETGsMahbmciLCJpYXQiOjE3NzgxMzY5NDIsImV4cCI6MTc3ODIyMzM0Mn0.cUhpvTiXCnrtI7KT3A0nzxC85sdFbyyxCm-t14U5Lr8"
-        }));
-    });
+    const loginPage = new LoginPage(page);
+    await loginPage.goToLoginPage();
+    await loginPage.handleLogin("nguyennamduong@gmail.com", "ThemGaRan");
+
+    await expect(page.locator(".toast-component")).toBeVisible();
+    await expect(page.locator(".toast-component__message")).toContainText("Đăng nhập thành công");
+    await expect(page).toHaveURL("/");
 
     await page.context().storageState({ path: 'e2e/resource/State_Auth.json' });
 });

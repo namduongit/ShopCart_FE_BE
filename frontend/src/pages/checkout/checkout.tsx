@@ -32,7 +32,9 @@ const CheckoutPage = () => {
 
     const { query: queryOrder, loading: orderLoading, errors: orderErrors } = useExecute<OrderDto>();
     const { query: queryCoupon, loading: couponLoading } = useExecute<CouponDto>();
-    const { query: queryCheckstock, data: dataCheckStock } = useExecute<boolean>();
+    const { query: queryCheckstock } = useExecute<boolean>();
+
+    let stockOk = false;
 
     const [form, setForm] = useState({
         fullName: authContext?.state?.name ?? "",
@@ -99,12 +101,23 @@ const CheckoutPage = () => {
             items: cartItems.map(item => ({
                 productId: item.product.id,
                 quantity: item.quantity
-        }))
+            }))
         }
 
-        await queryCheckstock(() => InventoryService.CheckStock(checkStockRequest), { issueNetwork: true });
+        await queryCheckstock(() => InventoryService.CheckStock(checkStockRequest), {
+            issueNetwork: true,
+            onSuccess(data) {
+                stockOk = data ?? false;
+            }
+        });
 
-        if (!dataCheckStock) {
+        if (!stockOk) {
+            notificationContext?.showToast({
+                id: Date.now(),
+                type: "error",
+                title: "Hết hàng",
+                message: "Một số sản phẩm đã hết hàng."
+            });
             return;
         }
 
@@ -199,6 +212,7 @@ const CheckoutPage = () => {
                                             <div style={{ flex: 1, position: "relative" }}>
                                                 <i className="fa-solid fa-tag" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#9ca3af", fontSize: 13, pointerEvents: "none" }} />
                                                 <input type="text" value={form.couponCode}
+                                                    id="coupon"
                                                     onChange={e => { setForm(f => ({ ...f, couponCode: e.target.value })); setCouponError(""); }}
                                                     placeholder="Nhập mã giảm giá..."
                                                     style={{ width: "100%", padding: "10px 14px 10px 36px", border: `1.5px solid ${couponError ? "#f87171" : "#e5e7eb"}`, borderRadius: 8, fontSize: 14, fontFamily: "inherit", color: "#111827", boxSizing: "border-box" }}
@@ -206,7 +220,7 @@ const CheckoutPage = () => {
                                                     onBlur={e => e.currentTarget.style.borderColor = couponError ? "#f87171" : "#e5e7eb"}
                                                     onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); void handleApplyCoupon(); } }} />
                                             </div>
-                                            <button type="button" onClick={handleApplyCoupon} disabled={couponLoading || !form.couponCode.trim()}
+                                            <button id="apply-coupon-button" type="button" onClick={handleApplyCoupon} disabled={couponLoading || !form.couponCode.trim()}
                                                 style={{ padding: "10px 18px", borderRadius: 8, border: "1.5px solid #2563eb", background: "#fff", color: "#2563eb", fontWeight: 600, fontSize: 13, cursor: couponLoading || !form.couponCode.trim() ? "not-allowed" : "pointer", fontFamily: "inherit", whiteSpace: "nowrap", opacity: !form.couponCode.trim() ? 0.5 : 1 }}>
                                                 {couponLoading ? <i className="fa-solid fa-circle-notch fa-spin" /> : "Áp dụng"}
                                             </button>

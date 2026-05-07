@@ -30,7 +30,7 @@ public class CreatePurchaseRequest {
     @Size(min = 10, max = 10, message = "Số điện thoại phải có 10 số")
     private String phone;
 
-    @NotNull(message = "Yêu cầu gửi địa chỉ")
+    // @NotNull(message = "Yêu cầu gửi địa chỉ")
     @NotBlank(message = "Địa chỉ nhận hàng không được để trống")
     private String address;
 
