@@ -72,7 +72,7 @@ public class CartControllerIntegrationTest {
                 when(jwtUtils.extractClaims(token)).thenReturn(mockClaims);
 
                 // Mock UserDetailsServiceImpl
-                UserDetailsImp mockUserDetails = new UserDetailsImp(1L, "John Doe", "user@example.com", "password");
+                UserDetailsImp mockUserDetails = new UserDetailsImp(1L, "Tran Cường", "user@example.com", "password");
                 when(userDetailsService.loadUserByUsername("user@example.com")).thenReturn(mockUserDetails);
 
         }

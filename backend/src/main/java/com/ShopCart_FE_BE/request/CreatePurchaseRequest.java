@@ -8,12 +8,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CreatePurchaseRequest {
     @NotNull(message = "Yêu cầu gửi danh sách sản phẩm")
     @Size(min = 1, message = "Danh sách ít nhất 1 sản phẩm")
@@ -42,6 +44,7 @@ public class CreatePurchaseRequest {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class PurchaseItem {
         @NotNull(message = "Yêu cầu gửi mã sản phẩm")
         private Long productId;
