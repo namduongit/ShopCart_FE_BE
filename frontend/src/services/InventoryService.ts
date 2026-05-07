@@ -1,11 +1,20 @@
 import { api } from "../libs/api"
 import type { Response } from "../libs/response";
 
+export type CheckStockItem = {
+    productId: number;
+    quantity: number;
+}
+
+export type CheckStockRequest = {
+    items: CheckStockItem[]
+}
+
 const InventoryService = {
-    async CheckStock(productId: number, quantity: number) {
-        const response = await api.get<Response<boolean>>(
-            `/api/inventory/${productId}/check`,
-            { params: { quantity } }
+    async CheckStock(request: CheckStockRequest) {
+        const response = await api.post<Response<boolean>>(
+            '/api/inventory/checkStock',
+            request
         );
         return response.data;
     },

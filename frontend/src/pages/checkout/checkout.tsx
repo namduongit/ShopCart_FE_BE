@@ -11,6 +11,7 @@ import SInput from "../../components/ui/sform/sinput/sinput";
 import SButton from "../../components/ui/sform/sbutton/sbutton";
 import type { OrderDto } from "../../libs/dto/OrderDto";
 import type { CouponDto } from "../../libs/dto/CouponDto";
+import InventoryService, { type CheckStockRequest } from "../../services/InventoryService";
 
 const fmtPrice = (p: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(p);
@@ -31,6 +32,7 @@ const CheckoutPage = () => {
 
     const { query: queryOrder, loading: orderLoading, errors: orderErrors } = useExecute<OrderDto>();
     const { query: queryCoupon, loading: couponLoading } = useExecute<CouponDto>();
+    const { query: queryCheckstock, data: dataCheckStock } = useExecute<boolean>();
 
     const [form, setForm] = useState({
         fullName: authContext?.state?.name ?? "",
@@ -92,6 +94,20 @@ const CheckoutPage = () => {
             notificationContext?.showToast({ id: Date.now(), type: "warning", title: "Mã chưa được áp dụng", message: "Vui lòng nhấn \"Áp dụng\" hoặc xóa mã trước khi đặt hàng." });
             return;
         }
+
+        const checkStockRequest: CheckStockRequest = {
+            items: cartItems.map(item => ({
+                productId: item.product.id,
+                quantity: item.quantity
+        }))
+        }
+
+        await queryCheckstock(() => InventoryService.CheckStock(checkStockRequest), { issueNetwork: true });
+
+        if (!dataCheckStock) {
+            return;
+        }
+
         let createdOrderId: number | undefined;
         await queryOrder(
             () => OrderService.CreateOrder({

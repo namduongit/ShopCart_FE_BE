@@ -4,10 +4,15 @@ import org.springframework.stereotype.Service;
 
 import com.ShopCart_FE_BE.entity.CartEntity;
 import com.ShopCart_FE_BE.entity.InventoryEntity;
+import com.ShopCart_FE_BE.entity.ProductEntity;
 import com.ShopCart_FE_BE.exception.InvalidException;
 import com.ShopCart_FE_BE.exception.NotFoundResource;
 import com.ShopCart_FE_BE.repository.CartRepository;
 import com.ShopCart_FE_BE.repository.InventoryRepository;
+import com.ShopCart_FE_BE.repository.ProductRepository;
+import com.ShopCart_FE_BE.request.CheckStockRequest;
+import com.ShopCart_FE_BE.request.CheckStockRequest.CheckStockItem;
+
 import java.util.List;
 
 @Service
@@ -15,30 +20,40 @@ public class InventoryService {
     
     private final InventoryRepository inventoryRepository;
     private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
 
     public InventoryService(
         InventoryRepository inventoryRepository,
-        CartRepository cartRepository
+        CartRepository cartRepository,
+        ProductRepository productRepository
     ) {
         this.inventoryRepository = inventoryRepository;
         this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
     } 
 
     public InventoryEntity saveInventory(InventoryEntity inventoryEntity) {
         return this.inventoryRepository.save(inventoryEntity);
     }
 
-    // update this method with new checking logic later
-    public boolean isAvailable(Long productId, int quantity) {
-        if (quantity <= 0) throw new InvalidException("Số lượng phải lớn hơn 0");
+    public boolean isAvailable(CheckStockRequest request) {
+        for (CheckStockItem item : request.getItems()) {
+            if (item.getQuantity() <= 0) throw new InvalidException("Số lượng sản phẩm phải lớn hơn 0");
+
+            ProductEntity prod = productRepository.findById(
+                item.getProductId()
+            ).orElseThrow(() -> new InvalidException("Không tìm thấy sản phẩm với id " + item.getProductId()));
+
+            if (prod.getStockAvailable() < item.getQuantity()) return false;
+        }
         
-        return this.getAvailableQuantity(productId) >= quantity;
+        return true;
     }
 
     public void decreaseStock(Long productId, int quantity) {
         InventoryEntity inv = this.inventoryRepository
                 .findByProductEntityId(productId)
-                .orElseThrow(() -> new NotFoundResource("Inventory with id " + productId + " not found"));
+                .orElseThrow(() -> new NotFoundResource("Không tìm thấy inventory với id " + productId));
     
         if (quantity <= 0) throw new InvalidException("Số lượng phải lớn hơn 0");
 
@@ -52,30 +67,13 @@ public class InventoryService {
     public void increaseStock(Long productId, int quantity) {
         InventoryEntity inv = this.inventoryRepository
             .findByProductEntityId(productId)
-            .orElseThrow(() -> new NotFoundResource("Inventory with id " + productId + " not found"));
+            .orElseThrow(() -> new NotFoundResource("Không tìm thấy inventory với id " + productId));
 
-        if (quantity <= 0 ) throw new InvalidException("Quantity must be greater than 0");
+        if (quantity <= 0 ) throw new InvalidException("Số lượng phải lớn hơn 0");
 
         inv.setStockQuantity(inv.getStockQuantity() + quantity);
 
         this.inventoryRepository.save(inv);
     }
 
-    // shoule be removed later when product has availability checking logic
-    public int getAvailableQuantity(Long productId) {
-        int reservedQuantity = 0;
-
-        InventoryEntity inv = this.inventoryRepository
-            .findByProductEntityId(productId)
-            .orElseThrow(() -> new NotFoundResource("Inventory with id " + productId + " not found"));
-
-        List<CartEntity> cartList = this.cartRepository
-            .findByProductEntityId(productId);
-
-        for (CartEntity prod : cartList) {
-            reservedQuantity += prod.getQuantity();
-        }
-
-        return inv.getStockQuantity() - reservedQuantity;
-    }
 }

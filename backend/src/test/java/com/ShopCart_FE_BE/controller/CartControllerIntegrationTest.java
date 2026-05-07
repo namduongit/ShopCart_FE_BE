@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.ShopCart_FE_BE.config.UserDetailsImp;
 import com.ShopCart_FE_BE.entity.CartEntity;
-import com.ShopCart_FE_BE.entity.InventoryEntity;
 import com.ShopCart_FE_BE.entity.ProductEntity;
 import com.ShopCart_FE_BE.entity.types.ProductStatus;
 import com.ShopCart_FE_BE.exception.InvalidException;
