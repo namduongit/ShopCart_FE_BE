@@ -1,8 +1,8 @@
 import axios, { AxiosError, type AxiosResponse } from "axios";
 
 const Api = () => {
-    const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
-
+    // const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
+    const API_ENDPOINT = "http://localhost:8080"
     const api = axios.create({
         baseURL: API_ENDPOINT,
         // Enable sending cookies with requests

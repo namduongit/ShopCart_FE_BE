@@ -7,11 +7,14 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { AuthContext } from "../contexts/auth-context";
 import { CartProvider } from "../contexts/cart-context";
 
-vi.mock("../services/cartService");
 
 import { cleanup } from "@testing-library/react";
 import CheckoutPage from "../pages/checkout/checkout";
 import { NotificateContext } from "../contexts/notificate-context";
+
+
+vi.mock("../services/CartService");
+
 
 afterEach(() => {
   cleanup();
