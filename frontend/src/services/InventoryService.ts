@@ -10,7 +10,7 @@ export type CheckStockRequest = {
     items: CheckStockItem[]
 }
 
-const InventoryService = {
+export const InventoryService = {
     async CheckStock(request: CheckStockRequest) {
         const response = await api.post<Response<boolean>>(
             '/api/inventories/checkStock',

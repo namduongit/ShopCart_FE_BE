@@ -96,6 +96,9 @@ export const useExecute = <T>() => {
                         message: errMessage,
                     });
                 }
+                else if (typeof (errMessage) === "object") {
+                    setErrors(errMessage);
+                }
             }
         }
         finally {

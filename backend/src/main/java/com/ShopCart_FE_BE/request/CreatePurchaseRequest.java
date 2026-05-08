@@ -26,7 +26,7 @@ public class CreatePurchaseRequest {
     private String fullName;
 
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Size(min = 10, max = 10, message = "Số điện thoại phải có 10 số")
+    @Pattern(regexp = "\\d{10}", message = "Số điện thoại chỉ được chứa 10 chữ số")
     private String phone ;
 
 
