@@ -2,33 +2,26 @@ package com.ShopCart_FE_BE.service;
 
 import org.springframework.stereotype.Service;
 
-import com.ShopCart_FE_BE.entity.CartEntity;
 import com.ShopCart_FE_BE.entity.InventoryEntity;
 import com.ShopCart_FE_BE.entity.ProductEntity;
 import com.ShopCart_FE_BE.exception.InvalidException;
 import com.ShopCart_FE_BE.exception.NotFoundResource;
-import com.ShopCart_FE_BE.repository.CartRepository;
 import com.ShopCart_FE_BE.repository.InventoryRepository;
 import com.ShopCart_FE_BE.repository.ProductRepository;
 import com.ShopCart_FE_BE.request.CheckStockRequest;
 import com.ShopCart_FE_BE.request.CheckStockRequest.CheckStockItem;
 
-import java.util.List;
-
 @Service
 public class InventoryService {
     
     private final InventoryRepository inventoryRepository;
-    private final CartRepository cartRepository;
     private final ProductRepository productRepository;
 
     public InventoryService(
         InventoryRepository inventoryRepository,
-        CartRepository cartRepository,
         ProductRepository productRepository
     ) {
         this.inventoryRepository = inventoryRepository;
-        this.cartRepository = cartRepository;
         this.productRepository = productRepository;
     } 
 

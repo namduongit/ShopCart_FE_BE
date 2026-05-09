@@ -40,7 +40,7 @@ describe("Checkout component Integration test", () => {
         },
       },
       {
-        id: 1,
+        id: 2,
         quantity: 1,
         total: 52990000.0,
         product: {
@@ -466,13 +466,13 @@ describe("Checkout component Integration test", () => {
       await screen.findByText("Apple MacBook Pro 14 inch M3 Pro"),
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId("checkout"))
-     await waitFor(() => {
+    fireEvent.click(screen.getByRole("button", { name: /Đặt hàng/i }));
+    await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "error",
-          title: "Lỗi",
-          message: "Một số sản phẩm đã hết hàng",
+          title: "Hết hàng",
+          message: "Không đủ số lượng sản phẩm để đặt hàng",
         }),
       );
     });

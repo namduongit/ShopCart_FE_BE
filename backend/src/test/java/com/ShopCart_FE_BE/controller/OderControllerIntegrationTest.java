@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+// import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,22 +17,22 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+// import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.security.autoconfigure.SecurityProperties.User;
+// import org.springframework.boot.security.autoconfigure.SecurityProperties.User;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+// import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.ShopCart_FE_BE.config.ForbiddenEntryPoint;
 import com.ShopCart_FE_BE.config.SecurityConfig;
 import com.ShopCart_FE_BE.config.UnauthorizedEntryPoint;
 import com.ShopCart_FE_BE.config.UserDetailsImp;
-import com.ShopCart_FE_BE.entity.CouponEntity;
+// import com.ShopCart_FE_BE.entity.CouponEntity;
 import com.ShopCart_FE_BE.entity.OrderEntity;
 import com.ShopCart_FE_BE.entity.OrderItemEntity;
 import com.ShopCart_FE_BE.entity.ProductEntity;
@@ -84,7 +84,7 @@ public class OderControllerIntegrationTest {
     private OrderEntity mockOrder;
     private UserEntity mockUser;
     private List<OrderItemEntity> mockOderItem;
-    private CouponEntity mockCoupon;
+//     private CouponEntity mockCoupon;
     private String token;
 
     @BeforeEach

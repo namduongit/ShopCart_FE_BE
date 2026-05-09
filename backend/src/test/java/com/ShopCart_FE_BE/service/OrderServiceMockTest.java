@@ -547,7 +547,7 @@ public class OrderServiceMockTest {
             10
         );
 
-        UserEntity user = createUser(1L);
+        // UserEntity user = createUser(1L);
         
         CouponEntity coupon = createCoupon(
             "magiamgia", 

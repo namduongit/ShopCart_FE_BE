@@ -11,6 +11,7 @@ export default defineConfig({
     tailwindcss()
   ],
   test: {
-    environment: 'jsdom'
+    environment: 'jsdom',
+    include: ['src/**/*.test.{ts,tsx}'],
   }
 })

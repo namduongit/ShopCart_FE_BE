@@ -10,6 +10,7 @@ import com.ShopCart_FE_BE.service.MomoService;
 @RequestMapping("/api/payments/")
 public class PaymentController {
 
+    @SuppressWarnings("unused")
     private final MomoService momoService;
 
     public PaymentController(MomoService momoService) {

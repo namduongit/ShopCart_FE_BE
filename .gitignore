@@ -61,3 +61,7 @@ volumes/
 docker-compose.yaml
 
 .codex
+.agents
+
+test-results/
+playwright-report/

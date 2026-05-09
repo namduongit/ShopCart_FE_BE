@@ -212,7 +212,7 @@ const CheckoutPage = () => {
         id: Date.now(),
         type: "error",
         title: "Hết hàng",
-        message: "Một số sản phẩm đã hết hàng.",
+        message: "Không đủ số lượng sản phẩm để đặt hàng",
       });
       return;
     }
@@ -509,7 +509,7 @@ const CheckoutPage = () => {
                           type="text"
                           value={form.couponCode}
                           id="coupon"
-                          data-testid="input-coupon   "
+                          data-testid="input-coupon"
                           onChange={(e) => {
                             setForm((f) => ({
                               ...f,
