@@ -15,15 +15,132 @@ import { CartContext } from "../contexts/cart-context";
 import CouponService from "../services/CouponService";
 import { NotificateContext } from "../contexts/notificate-context";
 import InventoryService from "../services/InventoryService";
+import OrderService from "../services/OrderService";
 
 vi.mock("../services/CouponService.ts");
 vi.mock("../services/InventoryService.ts")
+vi.mock("../services/OrderService.ts");
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
 });
 
 describe("Checkout component Integration test", () => {
+  test("Dat hang thanh cong", async () => {
+    const mockCart: CartDto[] = [
+      {
+        id: 1,
+        quantity: 1,
+        total: 52990000.0,
+        product: {
+          id: 4,
+          mainImageUrl:
+            "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_2__11.png",
+          name: "Apple MacBook Pro 14 inch M3 Pro",
+          price: 52990000.0,
+          status: "ACTIVE",
+        },
+      },
+    ];
+    const clearCart = vi.fn().mockResolvedValue(undefined);
+    const showToast = vi.fn();
+
+    vi.mocked(InventoryService.CheckStock).mockResolvedValue({
+      status: 200,
+      success: true,
+      message: "Success",
+      errors: null,
+      data: true,
+    });
+
+    vi.mocked(OrderService.CreateOrder).mockResolvedValue({
+      status: 201,
+      success: true,
+      message: "Created",
+      errors: null,
+      data: {
+        id: 3,
+      } as any,
+    });
+
+    render(
+      <MemoryRouter>
+        <AuthContext.Provider
+          value={{
+            state: {
+              id: 2,
+              name: "Nguyen Van A",
+              email: "nguyenvana@gmail.com",
+              token: "fake-token",
+            },
+            isAuthenticated: true,
+            saveState: vi.fn(),
+            clearState: vi.fn(),
+          }}
+        >
+          <NotificateContext.Provider
+            value={{
+              showToast,
+              showConfirmAlert: vi.fn(),
+            }}
+          >
+            <CartContext.Provider
+              value={{
+                cartItems: mockCart,
+                loading: false,
+                addToCart: vi.fn(),
+                removeFromCart: vi.fn(),
+                clearCart,
+                fetchCart: vi.fn(),
+              }}
+            >
+              <CheckoutPage />
+            </CartContext.Provider>
+          </NotificateContext.Provider>
+        </AuthContext.Provider>
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByText("Apple MacBook Pro 14 inch M3 Pro"),
+    ).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText("0987654321"), {
+      target: { value: "0909888333" },
+    });
+    fireEvent.change(
+      screen.getByPlaceholderText(
+        "Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành",
+      ),
+      {
+        target: { value: "123 abc" },
+      },
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Đặt hàng/i }));
+
+    await waitFor(() => {
+      expect(InventoryService.CheckStock).toHaveBeenCalledWith({
+        items: [{ productId: 4, quantity: 1 }],
+      });
+      expect(OrderService.CreateOrder).toHaveBeenCalledWith({
+        fullName: "Nguyen Van A",
+        phone: "0909888333",
+        address: "123 abc",
+        paymentMethod: "COD",
+        couponCode: undefined,
+        items: [{ productId: 4, quantity: 1 }],
+      });
+      expect(clearCart).toHaveBeenCalled();
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "success",
+          title: "Đặt hàng thành công",
+          message: "Đơn hàng #3 đã được tạo!",
+        }),
+      );
+    });
+  });
+
   test("Hien thi tong gia chinh xac", async () => {
     const mockCart: CartDto[] = [
       {
