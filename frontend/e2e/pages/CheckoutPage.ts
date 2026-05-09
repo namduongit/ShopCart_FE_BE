@@ -12,6 +12,8 @@ export default class CheckoutPage {
 
     readonly submitButton: Locator;
 
+    readonly totalDisplay: Locator;
+
     constructor(page: Page) {
         this.page = page;
         this.fullNameInput = page.locator('#fullName');
@@ -22,6 +24,8 @@ export default class CheckoutPage {
         this.applyCouponButton = page.locator('#apply-coupon-button');
 
         this.submitButton = page.locator('#checkout-submit');
+    
+        this.totalDisplay = page.getByTestId('subtotal-display');
     }
 
     async goToCheckoutPage() {
