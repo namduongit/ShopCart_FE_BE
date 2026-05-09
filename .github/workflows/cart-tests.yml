@@ -1,0 +1,45 @@
+name: Cart Tests CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-cart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Install playwright
+        run: |
+          cd frontend
+          npx playwright install --with-deps
+      
+      - name: Run cart unit tests (vitest)
+        run: |
+          cd frontend
+          npm run test:run -- src/tests/carts.mock.test.tsx src/tests/carts.integration.test.tsx
+
+      - name: Run cart E2E tests (playwright)
+        run: |
+          cd frontend
+          npx playwright test e2e/cart.e2e.spec.ts
+      
+      - name: Upload playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
