@@ -56,7 +56,6 @@ backend/.settings/
 
 application.yaml
 volumes/
-.github/
 
 docker-compose.yaml
 

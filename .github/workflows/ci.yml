@@ -1,0 +1,91 @@
+name: Complete CI/CD Pipeline
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    backend-test:
+        runs-on: ubuntu-latest
+        services:
+            postgres:
+                image: postgres:latest
+                env:
+                    POSTGRES_DB: shop-cart
+                    POSTGRES_USER: namduongit
+                    POSTGRES_PASSWORD: password
+                ports:
+                    - 5432:5432
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Java 21
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "21"
+                  distribution: "temurin"
+            
+            - name: Setup Maven
+              uses: styfle/cancel-workflow-action@0.12.0
+
+            - name: Backend Tests (JUnit 5 + Mockito)
+              run: |
+                  cd backend 
+                  mvn clean test jacoco:report
+              env:
+                  SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+                  SPRING_DATASOURCE_USERNAME: postgres
+                  SPRING_DATASOURCE_PASSWORD: password
+                  JWT_SECRET: this-is-a-long-secret-token-jwt-reuquired-greate-than-32-char
+
+            # - name: Upload Backend Coverage
+            #   uses: codecov/codecov-action@v4
+            #   with:
+            #       files: ./backend/target/site/jacoco/jacoco.xml
+
+    frontend-test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              name: Setup Node.js 22
+              with:
+                  node-version: "22"
+
+            - name: Install dependencies
+              run: cd frontend && npm ci
+
+            - name: Run Unit Tests (Vitest)
+              run: cd frontend && npm run test -- --coverage
+
+            - name: Upload Frontend Coverage
+              uses: codecov/codecov-action@v4
+              with:
+                  files: ./frontend/coverage/lcov.info
+
+    e2e-test:
+        runs-on: ubuntu-latest
+        needs: [backend-test, frontend-test]
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+
+            - name: Install dependencies
+              run: cd frontend && npm ci
+
+            - name: Install Playwright
+              run: cd frontend && npx playwright install --with-deps
+            
+            - name: Run E2E Tests (Playwright)
+              run: cd frontend && npx playwright test
+            
+            - name: Upload Playwright Report
+              uses: actions / upload - artifact@v4
+              if: always ()
+              with:
+                name : playwright - html - report
+                path : frontend / playwright - report /
+                retention - days : 30
