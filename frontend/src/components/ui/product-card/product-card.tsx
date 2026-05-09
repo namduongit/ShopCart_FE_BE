@@ -27,7 +27,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     };
 
     return (
-        <Link to={`/page/product/${product.id}`} style={{ display: "block", textDecoration: "none" }}>
+        <Link data-testid="demo-product" to={`/page/product/${product.id}`} style={{ display: "block", textDecoration: "none" }}>
             <div
                 className="fade-up"
                 style={{

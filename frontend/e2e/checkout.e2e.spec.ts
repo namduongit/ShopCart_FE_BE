@@ -140,7 +140,7 @@ const MAKE_PURCHASE = {
 const CART_AFTER_MAKE_PURCHASE = null;
 const SPECIFIC_PURCHASE_3 = MAKE_PURCHASE;
 
-const bootStrapMockResponse = (statusCode: number, data: any) => {
+export const bootStrapMockResponse = (statusCode: number, data: any) => {
     return {
         status: statusCode,
         contentType: "application/json",

@@ -12,13 +12,7 @@ export default class CartPage {
         this.cartBadge = page.getByTestId('cart-badge');
     }
 
-    async gotoProductsPage() {
-        await this.page.goto('/page/product');
+    async gotoCartPage() {
+        await this.page.goto('/page/cart');
     }
-
-    async addProductToCart() {
-
-    }
-
-
 }

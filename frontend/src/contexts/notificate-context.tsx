@@ -86,7 +86,7 @@ const NotificateProvider = ({ children }: { children: React.ReactNode }) => {
                             </div>
                             <div className={`flex-1 ${getTextColor(toast.type)}`}>
                                 <div className="flex justify-between">
-                                    <h1 className="font-semibold text-lg">
+                                    <h1 data-testid="toast-component__type" className="font-semibold text-lg">
                                         {toast.type === "success" && "Thành công"}
                                         {toast.type === "warning" && "Thất bại"}
                                         {toast.type === "error" && "Lỗi"}

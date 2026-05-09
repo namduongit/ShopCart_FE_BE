@@ -3,7 +3,7 @@ import LoginPage from '../pages/LoginPage';
 import { LOGIN_SUCCESS } from './script.setup';
 
 setup('authentication', async ({ page }: { page: Page }) => {
-    await page.route("/api/auth/login", route => route.fulfill(LOGIN_SUCCESS));
+    await page.route("**/api/auth/login", route => route.fulfill(LOGIN_SUCCESS));
 
     const loginPage = new LoginPage(page);
     await loginPage.goToLoginPage();
