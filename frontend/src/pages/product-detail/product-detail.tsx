@@ -523,6 +523,7 @@ const ProductDetailPage = () => {
                   {qty}
                 </span>
                 <button
+                  data-testid="increase-qty-btn"
                   onClick={() => setQty((q) => Math.min(stock || 99, q + 1))}
                   disabled={!isActive || qty >= availableQuantity}
                   style={{
