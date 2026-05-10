@@ -63,4 +63,4 @@ docker-compose.yaml
 .agents
 
 test-results/
-playwright-report/
+playwright-report
