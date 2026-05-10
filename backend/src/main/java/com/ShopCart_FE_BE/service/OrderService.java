@@ -216,4 +216,59 @@ public class OrderService {
 
         return orderEntity;
     }
+    public OrderEntity createOrder(Long userId, CreatePurchaseRequest request) {
+        return this.makePurchase(userId, request);
+    }
+
+    @Transactional
+    public void cancelOrder(Long userId, Long orderId) {
+        OrderEntity order = getOrderById(userId, orderId);
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new InvalidException("Đơn hàng đã được hủy trước đó");
+        }
+
+        // Hoàn tồn kho
+        for (OrderItemEntity item : order.getOrderItemEntities()) {
+            InventoryEntity inv = item.getProductEntity().getInventoryEntity();
+            inv.setStockQuantity(inv.getStockQuantity() + item.getQuantity());
+            this.inventoryRepository.save(inv);
+
+            // Nếu sản phẩm đang bị khóa (do hết hàng), mở lại nếu có hàng
+            if (item.getProductEntity().getStatus() == ProductStatus.INACTIVE && inv.getStockQuantity() > 0) {
+                item.getProductEntity().setStatus(ProductStatus.ACTIVE);
+                this.productRepository.save(item.getProductEntity());
+            }
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        this.orderRepository.save(order);
+    }
+
+    public BigDecimal calculateOrderTotal(List<OrderItemEntity> items, CouponEntity coupon) {
+        BigDecimal subtotal = items.stream()
+                .map(OrderItemEntity::getTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal shippingFee = subtotal.compareTo(FREE_SHIPPING_THRESHOLD) >= 0 ? BigDecimal.ZERO : SHIPPING_FEE;
+
+        BigDecimal total = subtotal;
+        if (coupon != null) {
+            total = total.subtract(coupon.getValue());
+        }
+
+        total = total.add(shippingFee);
+
+        return total.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : total;
+    }
+
+    public void checkStockBeforeOrder(List<PurchaseItem> items) {
+        for (PurchaseItem item : items) {
+            ProductEntity product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new NotFoundResource("Không tìm thấy sản phẩm id: " + item.getProductId()));
+            if (product.getInventoryEntity().getStockQuantity() < item.getQuantity()) {
+                throw new InvalidException("Sản phẩm '" + product.getName() + "' không đủ tồn kho");
+            }
+        }
+    }
 }
+
