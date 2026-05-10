@@ -1,5 +1,4 @@
 name: Complete CI/CD Pipeline
-
 on:
     push:
         branches: [main]
@@ -16,6 +15,12 @@ jobs:
                     POSTGRES_PASSWORD: password
                 ports:
                     - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
         steps:
             - uses: actions/checkout@v4
 
@@ -24,26 +29,24 @@ jobs:
               with:
                   java-version: "21"
                   distribution: "temurin"
-            
-            - name: Setup Maven
-              uses: styfle/cancel-workflow-action@0.12.0
 
             - name: Backend Tests (JUnit 5 + Mockito)
               run: |
-                  cd backend 
+                  cd backend
                   mvn clean test jacoco:report
               env:
-                  spring.datasource.url: jdbc:postgresql://postgres:5432/shop-cart
-                  spring.datasource.username: namduongit
-                  spring.datasource.password: password
-                  spring.datasource.driver-class-name: org.postgresql.Driver
-                  env.jwt_secret: this-is-a-long-secret-token-jwt-reuquired-greate-than-32-char
-                  env.momo.endpoint: http://endpoint.com
-                  env.momo.partner_code: http://partner_code.com
-                  env.momo.access_key: http://access_key.com
-                  env.momo.secret_key: http://secret_key.com
-                  env.momo.ipn: http://ipn.com
-                  env.momo.return: http://return.com
+                  SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/shop-cart
+                  SPRING_DATASOURCE_USERNAME: namduongit
+                  SPRING_DATASOURCE_PASSWORD: password
+                  SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+                  SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+                  JWT_SECRET: this-is-a-long-secret-token-jwt-reuquired-greate-than-32-char
+                  MOMO_ENDPOINT: http://endpoint.com
+                  MOMO_PARTNER_CODE: http://partner_code.com
+                  MOMO_ACCESS_KEY: http://access_key.com
+                  MOMO_SECRET_KEY: http://secret_key.com
+                  MOMO_IPN: http://ipn.com
+                  MOMO_RETURN: http://return.com
 
             - name: Upload Backend Coverage
               uses: codecov/codecov-action@v4
@@ -54,7 +57,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-              name: Setup Node.js 22
+
+            - name: Setup Node.js 22
+              uses: actions/setup-node@v4
               with:
                   node-version: "22"
 
@@ -85,14 +90,14 @@ jobs:
 
             - name: Install Playwright
               run: cd frontend && npx playwright install --with-deps
-            
+
             - name: Run E2E Tests (Playwright)
               run: cd frontend && npx playwright test
-            
+
             - name: Upload Playwright Report
-              uses: actions / upload - artifact@v4
-              if: always ()
+              uses: actions/upload-artifact@v4
+              if: always()
               with:
-                name : playwright - html - report
-                path : frontend / playwright - report /
-                retention - days : 30
+                  name: playwright-html-report
+                  path: frontend/playwright-report/
+                  retention-days: 30
