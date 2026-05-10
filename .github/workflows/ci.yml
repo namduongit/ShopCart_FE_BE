@@ -33,15 +33,22 @@ jobs:
                   cd backend 
                   mvn clean test jacoco:report
               env:
-                  SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
-                  SPRING_DATASOURCE_USERNAME: postgres
-                  SPRING_DATASOURCE_PASSWORD: password
-                  JWT_SECRET: this-is-a-long-secret-token-jwt-reuquired-greate-than-32-char
+                  spring.datasource.url: jdbc:postgresql://postgres:5432/shop-cart
+                  spring.datasource.username: namduongit
+                  spring.datasource.password: password
+                  spring.datasource.driver-class-name: org.postgresql.Driver
+                  env.jwt_secret: this-is-a-long-secret-token-jwt-reuquired-greate-than-32-char
+                  env.momo.endpoint: http://endpoint.com
+                  env.momo.partner_code: http://partner_code.com
+                  env.momo.access_key: http://access_key.com
+                  env.momo.secret_key: http://secret_key.com
+                  env.momo.ipn: http://ipn.com
+                  env.momo.return: http://return.com
 
-            # - name: Upload Backend Coverage
-            #   uses: codecov/codecov-action@v4
-            #   with:
-            #       files: ./backend/target/site/jacoco/jacoco.xml
+            - name: Upload Backend Coverage
+              uses: codecov/codecov-action@v4
+              with:
+                  files: ./backend/target/site/jacoco/jacoco.xml
 
     frontend-test:
         runs-on: ubuntu-latest
