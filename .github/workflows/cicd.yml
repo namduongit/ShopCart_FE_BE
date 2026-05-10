@@ -16,7 +16,7 @@ jobs:
                 ports:
                     - 5432:5432
                 options: >-
-                    --health-cmd pg_isready
+                    --health-cmd "pg_isready -U namduongit -d shop-cart"
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
@@ -40,13 +40,13 @@ jobs:
                   SPRING_DATASOURCE_PASSWORD: password
                   SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
                   SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-                  JWT_SECRET: this-is-a-long-secret-token-jwt-reuquired-greate-than-32-char
-                  MOMO_ENDPOINT: http://endpoint.com
-                  MOMO_PARTNER_CODE: http://partner_code.com
-                  MOMO_ACCESS_KEY: http://access_key.com
-                  MOMO_SECRET_KEY: http://secret_key.com
-                  MOMO_IPN: http://ipn.com
-                  MOMO_RETURN: http://return.com
+                  ENV_JWT_SECRET: this-is-a-long-secret-token-jwt-reuquired-greate-than-32-char
+                  ENV_MOMO_ENDPOINT: http://endpoint.com
+                  ENV_MOMO_PARTNER_CODE: http://partner_code.com
+                  ENV_MOMO_ACCESS_KEY: http://access_key.com
+                  ENV_MOMO_SECRET_KEY: http://secret_key.com
+                  ENV_MOMO_IPN: http://ipn.com
+                  ENV_MOMO_RETURN: http://return.com
 
             - name: Upload Backend Coverage
               uses: codecov/codecov-action@v4
