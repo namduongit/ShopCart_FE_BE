@@ -140,7 +140,12 @@ const MAKE_PURCHASE = {
 const CART_AFTER_MAKE_PURCHASE = null;
 const SPECIFIC_PURCHASE_3 = MAKE_PURCHASE;
 
-export const bootStrapMockResponse = (statusCode: number, data: any) => {
+const MISSING_FIELD = {
+    "phone": "Điện thoại không được để trống",
+    "address": "Địa chỉ không được để trống"
+}
+
+const bootStrapMockResponse = (statusCode: number, data: any) => {
     return {
         status: statusCode,
         contentType: "application/json",
@@ -150,6 +155,20 @@ export const bootStrapMockResponse = (statusCode: number, data: any) => {
             "message": statusCode < 400 ? "Success" : "Bad request",
             "errors": null,
             "data": data
+        })
+    }
+}
+
+const bootStrapMockErorResponse = (statusCode: number, errors: any) => {
+    return {
+        status: statusCode,
+        contentType: "application/json",
+        body: JSON.stringify({
+            "status": statusCode,
+            "success": statusCode < 400,
+            "message": statusCode < 400 ? "Success" : "Bad request",
+            "errors": errors,
+            "data": null
         })
     }
 }
@@ -179,9 +198,6 @@ test.describe('Purchase E2E Tests', () => {
         });
         await page.route("**/api/products/2", route => route.fulfill(bootStrapMockResponse(200, SPECIFIC_PRODUCT_2)));
         await page.route("**/api/carts/add", route => route.fulfill(bootStrapMockResponse(200, ADD_CART)));
-        await page.route("**/api/inventories/checkStock", router => router.fulfill(bootStrapMockResponse(200, CHECK_STOCK)));
-        await page.route("**/api/coupons/check", route => route.fulfill(bootStrapMockResponse(200, CHECK_COUPON)));
-        await page.route("**/api/purchases/", route => route.fulfill(bootStrapMockResponse(200, MAKE_PURCHASE)));
         await page.route("**/api/carts/clear", router => router.fulfill(bootStrapMockResponse(200, CART_AFTER_MAKE_PURCHASE)));
         await page.route("**/api/purchases/3", route => route.fulfill(bootStrapMockResponse(200, SPECIFIC_PURCHASE_3)));
 
@@ -190,17 +206,48 @@ test.describe('Purchase E2E Tests', () => {
         checkoutPage = new CheckoutPage(page);
     });
 
-    test('Complete Checkout Flow', async ({ page }) => {
-        page.on('request', req => {
-            if (req.url().includes('product')) {
-                console.log('REQUEST:', req.url());
-            }
-        });
-        page.on('response', res => {
-            if (res.url().includes('product')) {
-                console.log('RESPONSE:', res.url(), res.status());
-            }
-        });
+    test('TEST - Điền thiếu thông tin khi đặt hàng', async ({ page }) => {
+        await page.route("**/api/inventories/checkStock", router => router.fulfill(bootStrapMockResponse(200, CHECK_STOCK)));
+        await page.route("**/api/purchases/", route => route.fulfill(bootStrapMockErorResponse(400, MISSING_FIELD)));
+
+        await checkoutPage.goToCheckoutPage();
+        await checkoutPage.fillCheckoutForm("", "", "Nguyễn Nam Dương");
+        await checkoutPage.makePurchase();
+
+        await page.locator("#addresserr").waitFor({ state: "visible" });
+        await expect(page.locator("#addresserr")).toHaveText(MISSING_FIELD.address);
+
+        await page.locator("#phoneerr").waitFor({ state: "visible" });
+        await expect(page.locator("#phoneerr")).toHaveText(MISSING_FIELD.phone);
+    });
+
+    test('TEST - ÁP MÃ GIẢM GIÁ HẾT HẠN SỬ DỤNG', async ({ page }) => {
+        await page.route("**/api/coupons/check", route => route.fulfill(bootStrapMockErorResponse(400, "Mã giảm giá đã hết hạn")));
+
+        await checkoutPage.goToCheckoutPage();
+        await checkoutPage.fillCheckoutForm("0388853835", "273 An Dương Vương", "Nguyễn Nam Dương");
+        await checkoutPage.fillCoupon("DOLIBEE");
+        await checkoutPage.applyCoupon();
+
+        await page.locator("#couponerr").waitFor({ state: "visible" });
+        await expect(page.locator("#couponerr")).toHaveText("Mã giảm giá không hợp lệ hoặc đã hết hạn");
+    });
+
+    test('TEST - SẢN PHẨM HẾT HÀNG', async ({ page }) => {
+        await page.route("**/api/inventories/checkStock", route => route.fulfill(bootStrapMockResponse(200, !CHECK_STOCK)));
+        await checkoutPage.goToCheckoutPage();
+        await checkoutPage.fillCheckoutForm("0388853835", "273 An Dương Vương", "Nguyễn Nam Dương");
+
+        await checkoutPage.makePurchase();
+        await expect(page.locator('.toast-component')).toBeVisible();
+        await expect(page.locator('.toast-component__message')).toContainText('Không đủ số lượng sản phẩm để đặt hàng');
+
+    })
+
+    test('TEST - HOÀN THIỆN QUY TRÌNH MUA HÀNG', async ({ page }) => {
+        await page.route("**/api/inventories/checkStock", router => router.fulfill(bootStrapMockResponse(200, CHECK_STOCK)));
+        await page.route("**/api/purchases/", route => route.fulfill(bootStrapMockResponse(200, MAKE_PURCHASE)));
+        await page.route("**/api/coupons/check", route => route.fulfill(bootStrapMockResponse(200, CHECK_COUPON)));
 
         await productDetailPage.goToProductDetailPage(2);
         await productDetailPage.addToCart();

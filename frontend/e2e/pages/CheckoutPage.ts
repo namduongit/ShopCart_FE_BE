@@ -24,7 +24,7 @@ export default class CheckoutPage {
         this.applyCouponButton = page.locator('#apply-coupon-button');
 
         this.submitButton = page.locator('#checkout-submit');
-    
+
         this.totalDisplay = page.getByTestId('subtotal-display');
     }
 

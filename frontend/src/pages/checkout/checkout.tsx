@@ -28,13 +28,13 @@ const PAYMENT_METHODS: {
   label: string;
   icon: string;
 }[] = [
-  {
-    value: "COD",
-    label: "Thanh toán khi nhận hàng (COD)",
-    icon: "fa-money-bill-wave",
-  },
-  { value: "MOMO", label: "Ví MoMo", icon: "fa-wallet" },
-];
+    {
+      value: "COD",
+      label: "Thanh toán khi nhận hàng (COD)",
+      icon: "fa-money-bill-wave",
+    },
+    { value: "MOMO", label: "Ví MoMo", icon: "fa-wallet" },
+  ];
 
 const CheckoutPage = () => {
   const cartContext = useContext(CartContext);
@@ -532,9 +532,9 @@ const CheckoutPage = () => {
                             (e.currentTarget.style.borderColor = "#2563eb")
                           }
                           onBlur={(e) =>
-                            (e.currentTarget.style.borderColor = couponError
-                              ? "#f87171"
-                              : "#e5e7eb")
+                          (e.currentTarget.style.borderColor = couponError
+                            ? "#f87171"
+                            : "#e5e7eb")
                           }
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -577,6 +577,7 @@ const CheckoutPage = () => {
                   )}
                   {couponError && (
                     <p
+                      id="couponerr"
                       style={{
                         margin: "4px 0 0",
                         fontSize: 12,

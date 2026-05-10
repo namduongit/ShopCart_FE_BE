@@ -10,6 +10,10 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  server: {
+    port: 5173,
+    strictPort: true,   // Không tự nhảy port nếu 5173 bị chiếm
+  },
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],

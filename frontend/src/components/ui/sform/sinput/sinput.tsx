@@ -14,11 +14,11 @@ type SInputProps = {
     options?: {
         label?: React.ReactNode;
         // Start
-        prefix?: React.ReactNode;   
+        prefix?: React.ReactNode;
         // End with option action  
-        suffix?: {                   
+        suffix?: {
             element: React.ReactNode;
-            action?: () => void;     
+            action?: () => void;
         };
     };
 
@@ -37,10 +37,12 @@ const SInput = ({
     className,
 }: SInputProps) => {
     var errorMsg = "";
-    if (typeof(errors) === "object") {
+    if (typeof (errors) === "object") {
         errorMsg = errors?.[name];
     }
     const hasError = !!errorMsg;
+
+    const errorField = name + "err";
 
     return (
         <div className={className}>
@@ -131,11 +133,14 @@ const SInput = ({
             </div>
 
             {hasError && (
-                <p style={{
-                    fontSize: "12px", color: "#dc2626",
-                    margin: "4px 0 0",
-                    display: "flex", alignItems: "center", gap: "4px",
-                }}>
+
+                <p
+                    id={errorField}
+                    style={{
+                        fontSize: "12px", color: "#dc2626",
+                        margin: "4px 0 0",
+                        display: "flex", alignItems: "center", gap: "4px",
+                    }}>
                     <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: "11px" }} />
                     {errorMsg}
                 </p>
