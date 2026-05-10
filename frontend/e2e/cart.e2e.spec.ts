@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
+import { Layout } from './pages/Layout';
 import { ProductPage } from './pages/ProductPage';
 
 const bootStrapMockResponse = (statusCode: number, data: any) => {
@@ -82,7 +83,7 @@ const ADD_CART = {
 
 const ADD_CART_10 = {
     id: 1,
-    quantity: 10,
+    quantity: 11,
     total: SPECIFIC_PRODUCT_1.price,
     product: {
         id: SPECIFIC_PRODUCT_1.id,
@@ -94,12 +95,12 @@ const ADD_CART_10 = {
 }
 
 const CART: any[] = [];
-const CART_AFTER_ADD = [ADD_CART];
+
 
 test.describe('Cart E2E tests', () => {
 
     let productDetailPage: ProductDetailPage;
-    let cartPage: CartPage;
+    let layout: Layout;
     let productPage: ProductPage;
 
     test.beforeEach(async ({ page }) => {
@@ -111,17 +112,8 @@ test.describe('Cart E2E tests', () => {
             bootStrapMockResponse(200, SPECIFIC_PRODUCT_1)
         ));
 
-        let cartFetchCount = 0;
-        await page.route('**/api/carts/', route => {
-            cartFetchCount++;
-            route.fulfill(bootStrapMockResponse(200, cartFetchCount === 1 ? CART : CART_AFTER_ADD));
-        });
-
-        
-        
-
         productDetailPage = new ProductDetailPage(page);
-        cartPage = new CartPage(page);
+        layout = new Layout(page);
         productPage = new ProductPage(page);
     });
 
@@ -131,12 +123,19 @@ test.describe('Cart E2E tests', () => {
             route.fulfill(bootStrapMockResponse(200, ADD_CART))
         });
 
+        const CART_AFTER_ADD = [ADD_CART];
+        await page.route('**/api/carts/', route => {
+            route.fulfill(bootStrapMockResponse(200, CART_AFTER_ADD));
+        });
+
         await productPage.goToProductPage();
         await productPage.clickDemoProduct();
         await productDetailPage.addToCart();
 
         await expect(page.locator('.toast-component')).toBeVisible();
         await expect(page.locator('.toast-component__message')).toContainText('đã được thêm vào giỏ hàng');
+        await expect(layout.cartBadge).toBeVisible();
+        await expect(layout.cartBadge).toContainText('1');
     });
 
 
@@ -152,6 +151,11 @@ test.describe('Cart E2E tests', () => {
             }
         });
 
+        const CART_AFTER_ADD = [ADD_CART_10];
+        await page.route('**/api/carts/', route => {
+            route.fulfill(bootStrapMockResponse(200, CART_AFTER_ADD));
+        });
+
         await productPage.goToProductPage();
         await productPage.clickDemoProduct();
         await productDetailPage.increaseQuantity(10);
@@ -164,5 +168,8 @@ test.describe('Cart E2E tests', () => {
 
         await expect(errorToast).toBeVisible();
         await expect(errorToast.getByTestId('toast-component__type')).toContainText('Thất bại');
+
+        await expect(layout.cartBadge).toBeVisible();
+        await expect(layout.cartBadge).toContainText('11');
     });
 });
