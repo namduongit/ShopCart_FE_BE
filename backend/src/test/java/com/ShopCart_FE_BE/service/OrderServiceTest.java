@@ -57,7 +57,7 @@ public class OrderServiceTest {
     private OrderService orderService;
 
     @Test
-    @DisplayName("Test createOrder() – tạo đơn hàng, trừ tồn kho")
+    @DisplayName("Test createOrder() - tạo đơn hàng, trừ tồn kho")
     void createOrder_ShouldCreateOrderAndReduceStock() {
         Long userId = 1L;
         Long productId = 100L;
@@ -93,7 +93,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Test getOrderById() – lấy thông tin đơn hàng")
+    @DisplayName("Test getOrderById() - lấy thông tin đơn hàng")
     void getOrderById_ShouldReturnOrderInfo() {
         Long userId = 1L;
         Long orderId = 100L;
@@ -112,7 +112,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Test cancelOrder() – hủy đơn, hoàn tồn kho")
+    @DisplayName("Test cancelOrder() - hủy đơn, hoàn tồn kho")
     void cancelOrder_ShouldCancelOrderAndReturnStock() {
         Long userId = 1L;
         Long orderId = 100L;
@@ -150,7 +150,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Test calculateOrderTotal() – tính tổng giá chính xác")
+    @DisplayName("Test calculateOrderTotal() - tính tổng giá chính xác")
     void calculateOrderTotal_ShouldCalculateAccurately() {
         OrderItemEntity item1 = new OrderItemEntity();
         item1.setTotal(new BigDecimal("100000"));
@@ -165,7 +165,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Test checkStockBeforeOrder() – kiểm tra tồn kho")
+    @DisplayName("Test checkStockBeforeOrder() - kiểm tra tồn kho")
     void checkStockBeforeOrder_ShouldThrowExceptionWhenNotEnough() {
         Long productId = 100L;
         InventoryEntity inventory = new InventoryEntity();
