@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  test-cart:
+  test-purchase:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
