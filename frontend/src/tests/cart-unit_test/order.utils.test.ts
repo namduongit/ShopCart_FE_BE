@@ -1,58 +1,94 @@
 import { describe, expect, test } from "vitest";
-import { calculateOrderPrice, checkInventoryAvailability, type OrderItem, type Coupon } from "./order.utils";
+import { calculateOrderPrice, checkInventoryAvailability, type CouponCustom } from "./order.utils";
+import type { OrderItemProductDto } from "../../libs/dto/OrderItemProductDto";
+import type { OrderItemDto } from "../../libs/dto/OrderItemDto";
+
+const createMockProduct = (price: number): OrderItemProductDto => {
+    const id = Date.now();
+    return {
+        id: id,
+        mainImageUrl: "",
+        name: `Product ${id}`,
+        price: price,
+        status: "ACTIVE"
+    }
+}
 
 describe("Order Utils Tests (Price Calculation & Inventory)", () => {
-    
+    const mockProduct: OrderItemProductDto[] = [
+        createMockProduct(100),
+        createMockProduct(200),
+        createMockProduct(300),
+    ];
+
     describe("a) calculateOrderPrice()", () => {
-        const mockItems: OrderItem[] = [
-            { price: 100, quantity: 2 }, // 200
-            { price: 50, quantity: 2 }   // 100
-        ]; // Total subtotal = 300
+        const mockItems: OrderItemDto[] = [
+            {
+                id: Date.now(),
+                product: mockProduct[0],
+                quantity: 1,
+                total: mockProduct[0].price * 1
+            },
+            {
+                id: Date.now(),
+                product: mockProduct[1],
+                quantity: 1,
+                total: mockProduct[1].price * 1
+            }
+        ];
+
+        const totalPriceMock = mockItems.reduce((total, item) => total + item.product.price * item.quantity, 0);
 
         test("Test tính tổng giá trước giảm giá (subtotal)", () => {
             const result = calculateOrderPrice(mockItems);
-            expect(result.subtotal).toBe(300);
+
+            expect(result.subtotal).toBe(mockItems.reduce((total, item) => total + item.product.price * item.quantity, 0));
             expect(result.discount).toBe(0);
-            expect(result.total).toBe(300);
+            expect(result.total).toBe(mockItems.reduce((total, item) => total + item.product.price * item.quantity, 0));
         });
 
         test("Test áp dụng coupon giảm % (ví dụ: 10%, 20%)", () => {
-            const coupon10: Coupon = { type: 'PERCENTAGE', value: 10 };
-            const result10 = calculateOrderPrice(mockItems, coupon10);
-            expect(result10.discount).toBe(30); // 10% của 300
-            expect(result10.total).toBe(270);
+            const totalDiscountMock = (value: number) => Math.ceil(totalPriceMock * (value / 100));
 
-            const coupon20: Coupon = { type: 'PERCENTAGE', value: 20 };
-            const result20 = calculateOrderPrice(mockItems, coupon20);
-            expect(result20.discount).toBe(60); // 20% của 300
-            expect(result20.total).toBe(240);
+            const coupon1: CouponCustom = { code: "", type: 'PER', value: 10 };
+            const result1 = calculateOrderPrice(mockItems, coupon1);
+
+            expect(result1.discount).toBe(totalDiscountMock(coupon1.value));
+            expect(result1.total).toBe(totalPriceMock - totalDiscountMock(coupon1.value));
+
+            const coupon2: CouponCustom = { code: "", type: 'PER', value: 20 };
+
+            const result2 = calculateOrderPrice(mockItems, coupon2);
+            expect(result2.discount).toBe(totalDiscountMock(coupon2.value));
+            expect(result2.total).toBe(totalPriceMock - totalDiscountMock(coupon2.value));
+
         });
 
         test("Test áp dụng coupon giảm số tiền cố định", () => {
-            const couponFixed: Coupon = { type: 'FIXED', value: 50 };
-            const result = calculateOrderPrice(mockItems, couponFixed);
-            expect(result.discount).toBe(50);
-            expect(result.total).toBe(250);
+            const totalDiscount = (value: number) => value;
+
+            const coupon: CouponCustom = { code: "", type: 'FIXED', value: 10 };
+            const result = calculateOrderPrice(mockItems, coupon);
+            expect(result.discount).toBe(totalDiscount(coupon.value));
+            expect(result.total).toBe(totalPriceMock - totalDiscount(coupon.value));
         });
 
         test("Test tính phí vận chuyển", () => {
             const shippingFee = 30;
             const result = calculateOrderPrice(mockItems, undefined, shippingFee);
-            expect(result.shipping).toBe(30);
-            expect(result.total).toBe(330); // 300 + 30
+            expect(result.shipping).toBe(shippingFee);
+            expect(result.total).toBe(totalPriceMock + shippingFee);
         });
 
         test("Test tổng cuối cùng (subtotal + shipping - discount)", () => {
-            const coupon: Coupon = { type: 'PERCENTAGE', value: 10 }; // -30
+            const coupon: CouponCustom = { code: "", type: 'FIXED', value: 10 };
             const shippingFee = 20; // +20
             const result = calculateOrderPrice(mockItems, coupon, shippingFee);
-            
-            // Subtotal: 300, Discount: 30, Shipping: 20
-            // Total: 300 - 30 + 20 = 290
-            expect(result.subtotal).toBe(300);
-            expect(result.discount).toBe(30);
-            expect(result.shipping).toBe(20);
-            expect(result.total).toBe(290);
+
+            expect(result.subtotal).toBe(totalPriceMock);
+            expect(result.discount).toBe(coupon.value);
+            expect(result.shipping).toBe(shippingFee);
+            expect(result.total).toBe(totalPriceMock - coupon.value + shippingFee);
         });
     });
 

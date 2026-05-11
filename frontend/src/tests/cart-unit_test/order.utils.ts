@@ -1,26 +1,25 @@
-export type Coupon = {
-    type: 'PERCENTAGE' | 'FIXED';
-    value: number;
-};
+import type { OrderItemDto } from "../../libs/dto/OrderItemDto";
 
-export type OrderItem = {
-    price: number;
-    quantity: number;
-};
+export type CouponCustom = {
+    code: string;
+    type: "FIXED" | "PER";
+    value: number;
+}
 
 export const calculateOrderPrice = (
-    items: OrderItem[],
-    coupon?: Coupon,
+    items: OrderItemDto[],
+    coupon?: CouponCustom,
     shippingFee: number = 0
 ) => {
-    const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    
+    const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+
     let discount = 0;
     if (coupon) {
-        if (coupon.type === 'PERCENTAGE') {
-            discount = subtotal * (coupon.value / 100);
-        } else {
+        if (coupon.type === "FIXED") {
             discount = coupon.value;
+        }
+        if (coupon.type === "PER") {
+            discount = Math.ceil(subtotal * (coupon.value / 100));
         }
     }
 

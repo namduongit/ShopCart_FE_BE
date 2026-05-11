@@ -85,7 +85,7 @@ public class OrderServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(orderRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        OrderEntity result = orderService.createOrder(userId, request);
+        orderService.createOrder(userId, request);
 
         assertEquals(7, inventory.getStockQuantity());
         verify(orderRepository).save(any(OrderEntity.class));
